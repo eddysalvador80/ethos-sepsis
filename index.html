@@ -240,6 +240,42 @@ body {
 .slot { margin-top: 8px; border: 1px dashed var(--attention-border); background: var(--attention-bg); border-radius: 8px; padding: 9px 12px; font-size: 12px; color: var(--text-dim); line-height: 1.45; }
 .slot b { color: var(--attention); }
 
+/* ---- Bibliografía: modo Ácido-Base (citas clicables + modal + lista) ---- */
+.cite[onclick] { cursor: pointer; }
+.ref-list { display: flex; flex-direction: column; }
+.ref-group { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); font-weight: 700; margin: 16px 0 7px; padding-bottom: 4px; border-bottom: 1px solid var(--border-soft); }
+.ref-group:first-child { margin-top: 0; }
+.ref-row { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; cursor: pointer; background: var(--bg-elev); transition: .12s; }
+.ref-row:hover { border-color: var(--info); background: var(--info-bg); }
+.ref-badge { flex: none; font-family: ui-monospace, Menlo, monospace; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; letter-spacing: .3px; background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); white-space: nowrap; margin-top: 1px; }
+.ref-txt { font-size: 12.5px; color: var(--text); }
+.ref-txt b { color: var(--text); }
+.ref-hz { display: block; font-size: 11.5px; color: var(--text-dim); margin-top: 3px; line-height: 1.4; }
+.ref-count { font-size: 11px; color: var(--text-mute); text-align: center; margin-top: 12px; font-family: ui-monospace, Menlo, monospace; }
+.ref-modal { display: none; position: fixed; inset: 0; z-index: 100000; background: rgba(10,15,25,.55); align-items: center; justify-content: center; padding: 16px; }
+.ref-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 14px; max-width: 460px; width: 100%; padding: 18px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.35); max-height: 88vh; overflow-y: auto; }
+.ref-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.ref-x { border: none; background: var(--bg-elev2); color: var(--text-dim); width: 26px; height: 26px; border-radius: 7px; cursor: pointer; font-size: 13px; }
+.ref-card-short { font-size: 17px; font-weight: 700; color: var(--text); }
+.ref-card-aut { font-size: 12.5px; color: var(--text-dim); margin-top: 6px; }
+.ref-card-tit { font-size: 13.5px; color: var(--text); font-style: italic; margin-top: 6px; line-height: 1.4; }
+.ref-card-rev { font-size: 12.5px; color: var(--text-dim); margin-top: 6px; }
+.ref-card-id { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--info); margin-top: 4px; }
+.ref-card-hz-l { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-mute); margin-top: 14px; }
+.ref-card-hz { font-size: 13px; color: var(--text-dim); margin-top: 4px; line-height: 1.5; }
+.ref-card-link { display: inline-block; margin-top: 14px; font-size: 12.5px; color: var(--info); text-decoration: none; border: 1px solid var(--info-border); background: var(--info-bg); border-radius: 8px; padding: 6px 12px; }
+
+/* ---- Práctica: casos ---- */
+.case-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 15px 17px; margin-bottom: 13px; }
+.case-tit { font-size: 14.5px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.case-vin { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+.case-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.case-load { border: 0; border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; background: var(--tD); color: #fff; font-family: inherit; }
+.case-toggle { border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12.5px; cursor: pointer; background: var(--bg-elev2); color: var(--text-dim); font-family: inherit; }
+.case-reveal { display: none; margin-top: 12px; padding: 12px 14px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 8px; font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+.case-reveal b { color: var(--text); }
+.case-toast { display: none; background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok); border-radius: 8px; padding: 9px 13px; font-size: 12.5px; font-weight: 600; margin-bottom: 13px; }
+
 .foot { grid-column: 1 / -1; text-align: center; color: var(--text-mute); font-size: 11px; padding: 18px 0 6px; font-family: ui-monospace, Menlo, monospace; }
 
 @media (max-width: 900px) {
@@ -369,6 +405,7 @@ body {
     <div class="main-tabs">
       <button class="main-tab active" onclick="showTab('primera',this)">Primera hora</button>
       <button class="main-tab" onclick="showTab('aprender',this)">Aprender</button>
+      <button class="main-tab" onclick="showTab('practica',this)">Práctica</button>
       <button class="main-tab" onclick="showTab('deriv',this)">Derivaciones</button>
       <button class="main-tab" onclick="showTab('ref',this)">Referencias</button>
     </div>
@@ -650,6 +687,20 @@ body {
       </div>
       <div class="note-box" style="margin-top:14px"><b>Lo que la app NUNCA hace</b> (y por qué es docente, no dispositivo): no estampa el diagnóstico "es sepsis", no da un reloj de antibiótico por paciente, no ordena volumen ni dosis. Eso es tuyo — mira la pestaña <b>Derivaciones</b>.</div>
 
+      <div class="tool-card" style="border-left-color:var(--accent)">
+        <h4>La evidencia detrás de la reanimación <span style="font-weight:400;color:var(--text-mute)">— toca cada cita para el detalle</span></h4>
+        <div class="learn-lead" style="margin:0 0 10px">Lo que los grandes ensayos cambiaron (y por qué la app enseña así):</div>
+        <dl>
+          <dt>30 mL/kg = piso</dt><dd>La reanimación agresiva protocolizada NO supera al cuidado habitual (<a class="cite" onclick="rc('process2014')">ProCESS</a>, <a class="cite" onclick="rc('arise2014')">ARISE</a>, <a class="cite" onclick="rc('promise2015')">ProMISe</a>, <a class="cite" onclick="rc('prism2017')">PRISM</a>), y tras el bolo inicial, más fluido no gana a pasar a vasopresor precoz (<a class="cite" onclick="rc('clovers2023')">CLOVERS</a>, <a class="cite" onclick="rc('classic2022')">CLASSIC</a>). Es piso inicial, no meta rígida.</dd>
+          <dt>Meta PAM 65</dt><dd>Apuntar a 80–85 no bajó la mortalidad (<a class="cite" onclick="rc('sepsispam2014')">SEPSISPAM</a>). 65 basta (60–65 si ≥65 a).</dd>
+          <dt>Vasopresor</dt><dd>Noradrenalina de 1ª línea (menos arritmias que dopamina, <a class="cite" onclick="rc('soap2010')">SOAP II</a>) y precoz (<a class="cite" onclick="rc('censer2019')">CENSER</a>); vasopresina como coadyuvante (<a class="cite" onclick="rc('vasst2008')">VASST</a>).</dd>
+          <dt>Corticoides</dt><dd>Controversia real: <a class="cite" onclick="rc('adrenal2018')">ADRENAL</a> (revierte el shock más rápido, sin ↓ mortalidad) vs <a class="cite" onclick="rc('aprocchss2018')">APROCCHSS</a> (sí ↓ mortalidad). Indicación: shock que no responde a fluidos + vasopresor.</dd>
+          <dt>Tipo de fluido</dt><dd>Balanceados razonables pero de efecto pequeño: a favor <a class="cite" onclick="rc('smart2018')">SMART</a>; neutros <a class="cite" onclick="rc('basics2021')">BaSICS</a> y <a class="cite" onclick="rc('plus2022')">PLUS</a>.</dd>
+          <dt>Lactato</dt><dd>Como tendencia/meta: <a class="cite" onclick="rc('andromeda2019')">ANDROMEDA-SHOCK</a> (perfusión ≈ lactato) y <a class="cite" onclick="rc('jones2010')">Jones 2010</a> (aclaramiento ≥10%).</dd>
+          <dt>Antibiótico</dt><dd>Asociación fuerte en shock (<a class="cite" onclick="rc('kumar2006')">Kumar</a>); el timing del ATB pesa, el del bolo de fluidos no (<a class="cite" onclick="rc('seymour2017')">Seymour 2017</a>). Hemocultivo antes (<a class="cite" onclick="rc('cheng2019')">FABLED</a>).</dd>
+        </dl>
+      </div>
+
       <!-- §4 -->
       <h3 class="learn-sec" id="l4">4 · Lo que cambió / controversias</h3>
       <div class="contro"><h3>1 · qSOFA salió como cribado</h3><p>La SSC 2026 recomienda NEWS/NEWS2/SIRS <b>sobre</b> qSOFA para cribar (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#4</a>). qSOFA sigue útil para enseñar, pero ya no es la puerta de entrada.</p></div>
@@ -680,6 +731,12 @@ body {
       </div>
     </div>
 
+    <!-- ===== PRÁCTICA ===== -->
+    <div class="tab-panel" id="tab-practica">
+      <div class="note-box"><b>Aprende haciendo.</b> Cada caso <b>carga el tablero de la izquierda</b> (NEWS2 · qSOFA · SOFA · gatillos) para que veas los scores computarse sobre un paciente real. Piensa tu conducta de la primera hora <b>antes</b> de abrir "Ver conducta". El clínico decides tú.</div>
+      <div id="case-list"></div>
+    </div>
+
     <!-- ===== DERIVACIONES ===== -->
     <div class="tab-panel" id="tab-deriv">
       <div class="prohib">
@@ -706,43 +763,28 @@ body {
 
     <!-- ===== REFERENCIAS ===== -->
     <div class="tab-panel" id="tab-ref">
-      <div class="note-box"><b>Regla de integridad.</b> Toda ancla lleva su recibo (rec.# + fuerza + cita textual), verificado en fuente primaria. Un número sin recibo es tan atacable como uno inventado.</div>
-
-      <div class="refblock">
-        <h3>SSC 2026 — corazón de las decisiones</h3>
-        <div class="meta">Prescott HC, Antonelli M, Alhazzani W, et al. <i>Surviving Sepsis Campaign… 2026.</i> Crit Care Med 2026;54(4):725–812. <a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">DOI 10.1097/CCM.0000000000007075</a> · PMID 41869847</div>
-        <div class="quote">Verificado: Table of Statements (recs 1–129; 46 nuevas), págs. 725–734. Última versión oficial vigente (reemplaza SSC 2021 de Evans et al.).</div>
-      </div>
-      <div class="refblock">
-        <h3>Sepsis-3 — definición y qSOFA</h3>
-        <div class="meta">Singer M, et al. JAMA 2016;315(8):801–810. <a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">DOI 10.1001/jama.2016.0287</a></div>
-        <div class="quote">Verificado: definiciones + qSOFA (FR≥22 / GCS≤14 / PAS≤100), SOFA ≥2.</div>
-      </div>
-      <div class="refblock">
-        <h3>SOFA — tabla de disfunción orgánica</h3>
-        <div class="meta">Vincent JL, et al. <i>The SOFA score to describe organ dysfunction/failure.</i> Intensive Care Med 1996;22(7):707–710. <a class="cite" href="https://doi.org/10.1007/BF01709751" target="_blank">DOI 10.1007/BF01709751</a> · PMID 8844239</div>
-        <div class="quote">Cortes 0–4 de los 6 sistemas verificados contra la reproducción de acceso abierto: <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6880479/" target="_blank">Lambden 2019, Crit Care 23:374 (Tabla 1)</a>. Dato: "SOFA" fue originalmente <i>Sepsis-related</i> Organ Failure Assessment; se renombró <i>Sequential</i> al validarse en no sépticos.</div>
-      </div>
-      <div class="refblock">
-        <h3>GT-LATINFURG 2026 — cadena de 6 eslabones (regional / LATAM)</h3>
-        <div class="meta">Julián-Jiménez A, et al. Emergencias 2026;38(1):27–63. <a class="cite" href="https://doi.org/10.55633/s3me/005.2026" target="_blank">DOI 10.55633/s3me/005.2026</a></div>
-        <div class="quote">Verificado: cadena de 6 eslabones + gatillo de cribado (PICO 1) + timing estratificado desde triaje (Tabla 10, PICO 9). Estructura el flujo de esta app.</div>
-      </div>
-      <div class="refblock">
-        <h3>SOCHIMI 2017 — respaldo chileno (contexto nacional)</h3>
-        <div class="meta">Romero C, Luengo C, Regueira T, Castro R, Hernández G, et al. <i>Recomendaciones SOCHIMI para el Manejo Inicial de la Sepsis.</i> Rev Chil Med Intensiva 2017;32(2):107–126. <a class="cite" href="https://medicina-intensiva.cl/post.php?id=1000222" target="_blank">Sociedad Chilena de Medicina Intensiva</a></div>
-        <div class="quote">Respalda el contenido de la app (antibiótico &lt;1 h; ≥30 mL/kg si hipotensión o lactato &gt;2; PAM 65–70; noradrenalina 1ª línea; sin almidones). Matiz chileno: SIRS-céntrico y disiente de Sepsis-3 (ver Aprender §5). Documento de sociedad científica; no hay guía MINSAL/GES nacional de sepsis del adulto.</div>
-      </div>
-      <div class="refblock">
-        <h3>NEWS2 — score de cribado</h3>
-        <div class="meta">Royal College of Physicians. <i>National Early Warning Score (NEWS) 2.</i> Updated report of a working party. London: RCP, 2017. <a class="cite" href="https://www.rcp.ac.uk/media/a4ibkkbf/news2-final-report_0_0.pdf" target="_blank">Informe oficial (PDF)</a></div>
-        <div class="quote">Tabla de 7 parámetros verificada en el informe oficial. Escala 2 (SpO₂ objetivo 88–92%) para fallo respiratorio hipercápnico (EPOC).</div>
-      </div>
+      <div class="note-box"><b>Regla de integridad.</b> 32 referencias, cada una con su cita <b>verificada en fuente primaria</b> (PMID/DOI resuelto). <b>Toca cualquiera</b> para ver el detalle y qué respalda. Un número sin recibo es tan atacable como uno inventado.</div>
+      <div id="ref-list" class="ref-list"></div>
     </div>
 
   </div>
 
   <div class="foot">ETHOS · Sepsis v1.0 — tutor docente estático · anclado en codebook v2 (congelado) · núcleo y tabla SOFA verificados en fuente primaria · el clínico decide</div>
+
+  <!-- Modal de referencia (citas clicables) -->
+  <div id="refModal" class="ref-modal" onclick="if(event.target===this)closeRefModal()">
+    <div class="ref-card">
+      <div class="ref-card-head"><span id="rm-tag" class="ref-badge">—</span><button class="ref-x" onclick="closeRefModal()">✕</button></div>
+      <div id="rm-short" class="ref-card-short">—</div>
+      <div id="rm-aut" class="ref-card-aut">—</div>
+      <div id="rm-tit" class="ref-card-tit">—</div>
+      <div id="rm-rev" class="ref-card-rev">—</div>
+      <div id="rm-id" class="ref-card-id">—</div>
+      <div class="ref-card-hz-l">Qué respalda</div>
+      <div id="rm-hz" class="ref-card-hz">—</div>
+      <a id="rm-link" href="#" target="_blank" class="ref-card-link">Ver fuente ↗</a>
+    </div>
+  </div>
 
 </div>
 
@@ -877,6 +919,142 @@ function calcSofa(){
   else { f.classList.add('flag-ok'); f.textContent = (n<6 ? 'Parcial' : 'Sin disfunción'); }
 }
 
+/* ---------- Bibliografía: modo Ácido-Base (citas clicables + modal) ---------- */
+/* Cada PMID/DOI resuelto en fuente (PubMed/Crossref). Ver ETHOS-Sepsis_Bibliografia_v2.md */
+const REFS = {
+  // — Anclajes / guías madre —
+  ssc2026:{a:'ancla',tag:'Guía',short:'SSC 2026',autores:'Prescott HC, Antonelli M, Alhazzani W, et al.',titulo:'Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2026',rev:'Crit Care Med 2026;54(4):725-812',id:'PMID 41869847 · DOI 10.1097/CCM.0000000000007075',hz:'Guía madre vigente (129 recomendaciones, 46 nuevas). Corazón de las decisiones de la app.',url:'https://doi.org/10.1097/CCM.0000000000007075'},
+  sepsis3:{a:'ancla',tag:'Consenso',short:'Sepsis-3',autores:'Singer M, Deutschman CS, Seymour CW, et al.',titulo:'The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3)',rev:'JAMA 2016;315(8):801-810',id:'PMID 26903338 · DOI 10.1001/jama.2016.0287',hz:'Definición vigente: sepsis = disfunción orgánica (SOFA↑≥2) por respuesta desregulada; shock = vasopresor + lactato >2 (mortalidad >40%).',url:'https://doi.org/10.1001/jama.2016.0287'},
+  sofa1996:{a:'ancla',tag:'Score',short:'SOFA (Vincent 1996)',autores:'Vincent JL, Moreno R, Takala J, et al.',titulo:'The SOFA (Sepsis-related Organ Failure Assessment) score to describe organ dysfunction/failure',rev:'Intensive Care Med 1996;22(7):707-710',id:'PMID 8844239 · DOI 10.1007/BF01709751',hz:'Tabla original de disfunción de 6 órganos (0-24). Verificada vía Lambden 2019 (PMC6880479).',url:'https://doi.org/10.1007/BF01709751'},
+  news2:{a:'ancla',tag:'Score',short:'NEWS2 (RCP 2017)',autores:'Royal College of Physicians',titulo:'National Early Warning Score (NEWS) 2. Updated report of a working party',rev:'London: RCP, 2017',id:'Informe oficial RCP',hz:'Score de deterioro (7 signos). Cribado preferido; ≥5 urgente, ≥7 emergencia.',url:'https://www.rcp.ac.uk/media/a4ibkkbf/news2-final-report_0_0.pdf'},
+  gtlatinfurg2026:{a:'ancla',tag:'Consenso',short:'GT-LATINFURG 2026',autores:'Julián-Jiménez A, et al.',titulo:'Recomendaciones del GT-LATINFURG para la infección grave y sepsis en urgencias',rev:'Emergencias 2026;38(1):27-63',id:'DOI 10.55633/s3me/005.2026',hz:'Consenso de urgencias con co-autor chileno (HUAP). Gatillo de cribado y timing desde triaje.',url:'https://doi.org/10.55633/s3me/005.2026'},
+  sochimi2017:{a:'ancla',tag:'Chile',short:'SOCHIMI 2017',autores:'Romero C, Luengo C, Regueira T, Castro R, Hernández G, et al.',titulo:'Recomendaciones SOCHIMI para el Manejo Inicial de la Sepsis',rev:'Rev Chil Med Intensiva 2017;32(2):107-126',id:'Sociedad Chilena de Medicina Intensiva',hz:'Ancla chilena. Respalda la conducta; SIRS-céntrica y disiente de Sepsis-3 (ver Aprender §5).',url:'https://medicina-intensiva.cl/post.php?id=1000222'},
+  // — Cribado / definiciones —
+  seymour2016:{a:'cribado',tag:'Landmark',short:'Seymour 2016 (qSOFA)',autores:'Seymour CW, Liu VX, Iwashyna TJ, et al.',titulo:'Assessment of Clinical Criteria for Sepsis',rev:'JAMA 2016;315(8):762-774',id:'PMID 26903335 · DOI 10.1001/jama.2016.0288',hz:'Validación de qSOFA: fuera de UCI discrimina mortalidad (AUROC 0.81), pero sensibilidad baja.',url:'https://doi.org/10.1001/jama.2016.0288'},
+  bone1992:{a:'cribado',tag:'Histórico',short:'Bone 1992 (SIRS)',autores:'Bone RC, Balk RA, Cerra FB, et al. (ACCP/SCCM)',titulo:'Definitions for sepsis and organ failure and guidelines for the use of innovative therapies in sepsis',rev:'Chest 1992;101(6):1644-1655',id:'PMID 1303622 · DOI 10.1378/chest.101.6.1644',hz:'Origen de los criterios SIRS (≥2 de 4). Superado por Sepsis-3 pero vigente como cribado sensible.',url:'https://doi.org/10.1378/chest.101.6.1644'},
+  churpek2017:{a:'cribado',tag:'Landmark',short:'Churpek 2017',autores:'Churpek MM, Snyder A, Han X, et al.',titulo:'qSOFA, SIRS, and Early Warning Scores for Detecting Clinical Deterioration in Infected Patients outside the ICU',rev:'Am J Respir Crit Care Med 2017;195(7):906-911',id:'PMID 27649072 · DOI 10.1164/rccm.201604-0854OC',hz:'NEWS (AUROC 0.77) > qSOFA (0.69) > SIRS (0.65). qSOFA no debe reemplazar los early warning scores.',url:'https://doi.org/10.1164/rccm.201604-0854OC'},
+  fernando2018:{a:'cribado',tag:'Meta-análisis',short:'Fernando 2018',autores:'Fernando SM, Tran A, Taljaard M, et al.',titulo:'Prognostic Accuracy of qSOFA for Mortality in Patients With Suspected Infection',rev:'Ann Intern Med 2018;168(4):266-275',id:'PMID 29404582 · DOI 10.7326/M17-2820',hz:'qSOFA sensibilidad 60.8% vs SIRS 88.1%: SIRS más sensible para cribar.',url:'https://doi.org/10.7326/M17-2820'},
+  // — Antibiótico (timing) —
+  kumar2006:{a:'atb',tag:'Landmark',short:'Kumar 2006',autores:'Kumar A, Roberts D, Wood KE, et al.',titulo:'Duration of hypotension before initiation of effective antimicrobial therapy is the critical determinant of survival in human septic shock',rev:'Crit Care Med 2006;34(6):1589-1596',id:'PMID 16625125 · DOI 10.1097/01.CCM.0000217961.75225.E9',hz:'En shock: 79.9% supervivencia si ATB en la 1ª hora; −7.6% por cada hora de retraso (observacional).',url:'https://doi.org/10.1097/01.CCM.0000217961.75225.E9'},
+  seymour2017:{a:'atb',tag:'Landmark',short:'Seymour 2017 (NEJM)',autores:'Seymour CW, Gesten F, Prescott HC, et al.',titulo:'Time to Treatment and Mortality during Mandated Emergency Care for Sepsis',rev:'N Engl J Med 2017;376(23):2235-2244',id:'PMID 28528569 · DOI 10.1056/NEJMoa1703058',hz:'Mandato NY: el timing del antibiótico se asoció a mortalidad (OR 1.04/h); el del bolo de fluidos NO.',url:'https://doi.org/10.1056/NEJMoa1703058'},
+  ferrer2014:{a:'atb',tag:'Landmark',short:'Ferrer 2014',autores:'Ferrer R, Martin-Loeches I, Phillips G, et al.',titulo:'Empiric antibiotic treatment reduces mortality in severe sepsis and septic shock from the first hour',rev:'Crit Care Med 2014;42(8):1749-1755',id:'PMID 24717459 · DOI 10.1097/CCM.0000000000000330',hz:'Aumento lineal de mortalidad por cada hora de retraso del antibiótico, desde la 1ª hora.',url:'https://doi.org/10.1097/CCM.0000000000000330'},
+  // — Hemocultivos —
+  cheng2019:{a:'cultivo',tag:'Landmark',short:'FABLED / Cheng 2019',autores:'Cheng MP, Stenstrom R, Paquette K, et al.',titulo:'Blood Culture Results Before and After Antimicrobial Administration in Patients With Severe Sepsis',rev:'Ann Intern Med 2019;171(8):547-554',id:'PMID 31525774 · DOI 10.7326/M19-1696',hz:'Positividad 31.4%→19.4% si el cultivo se toma tras el ATB; sensibilidad cae a 52.9%. Hemocultivo ANTES.',url:'https://doi.org/10.7326/M19-1696'},
+  // — Lactato / perfusión —
+  andromeda2019:{a:'lactato',tag:'Landmark',short:'ANDROMEDA-SHOCK 2019',autores:'Hernández G, Ospina-Tascón GA, Damiani LP, et al.',titulo:'Effect of a Resuscitation Strategy Targeting Peripheral Perfusion vs Serum Lactate on 28-Day Mortality',rev:'JAMA 2019;321(7):654-664',id:'PMID 30772908 · DOI 10.1001/jama.2019.0071',hz:'Perfusión (llene capilar) vs lactato: mortalidad 34.9% vs 43.4%, HR 0.75, p=0.06 (no significativa).',url:'https://doi.org/10.1001/jama.2019.0071'},
+  jones2010:{a:'lactato',tag:'Landmark',short:'Jones 2010',autores:'Jones AE, Shapiro NI, Trzeciak S, et al.',titulo:'Lactate clearance vs central venous oxygen saturation as goals of early sepsis therapy',rev:'JAMA 2010;303(8):739-746',id:'PMID 20179283 · DOI 10.1001/jama.2010.158',hz:'Aclaramiento de lactato ≥10% NO inferior a la meta de ScvO2. Valida el lactato como meta.',url:'https://doi.org/10.1001/jama.2010.158'},
+  // — Fluidos: volumen / estrategia —
+  process2014:{a:'volumen',tag:'Landmark',short:'ProCESS 2014',autores:'ProCESS Investigators (Yealy DM, et al.)',titulo:'A Randomized Trial of Protocol-Based Care for Early Septic Shock',rev:'N Engl J Med 2014;370(18):1683-1693',id:'PMID 24635773 · DOI 10.1056/NEJMoa1401602',hz:'Cuidado protocolizado (EGDT) no superó al cuidado habitual.',url:'https://doi.org/10.1056/NEJMoa1401602'},
+  arise2014:{a:'volumen',tag:'Landmark',short:'ARISE 2014',autores:'ARISE Investigators; ANZICS CTG',titulo:'Goal-Directed Resuscitation for Patients with Early Septic Shock',rev:'N Engl J Med 2014;371(16):1496-1506',id:'PMID 25272316 · DOI 10.1056/NEJMoa1404380',hz:'EGDT sin beneficio de mortalidad (18.6% vs 18.8%).',url:'https://doi.org/10.1056/NEJMoa1404380'},
+  promise2015:{a:'volumen',tag:'Landmark',short:'ProMISe 2015',autores:'Mouncey PR, Osborn TM, Power GS, et al.',titulo:'Trial of Early, Goal-Directed Resuscitation for Septic Shock',rev:'N Engl J Med 2015;372(14):1301-1311',id:'PMID 25776532 · DOI 10.1056/NEJMoa1500896',hz:'EGDT sin beneficio; cierra el trío ProCESS/ARISE/ProMISe.',url:'https://doi.org/10.1056/NEJMoa1500896'},
+  prism2017:{a:'volumen',tag:'Meta-análisis',short:'PRISM 2017',autores:'PRISM Investigators (Rowan KM, Angus DC, et al.)',titulo:'Early, Goal-Directed Therapy for Septic Shock — A Patient-Level Meta-Analysis',rev:'N Engl J Med 2017;376(23):2223-2234',id:'PMID 28320242 · DOI 10.1056/NEJMoa1701380',hz:'Datos individuales de los 3 EGDT: sin beneficio de supervivencia (OR 0.97).',url:'https://doi.org/10.1056/NEJMoa1701380'},
+  classic2022:{a:'volumen',tag:'Landmark',short:'CLASSIC 2022',autores:'Meyhoff TS, et al.',titulo:'Restriction of Intravenous Fluid in ICU Patients with Septic Shock',rev:'N Engl J Med 2022;386(26):2459-2470',id:'PMID 35709019 · DOI 10.1056/NEJMoa2202707',hz:'Fluido restrictivo en UCI: sin diferencia de mortalidad vs estándar.',url:'https://doi.org/10.1056/NEJMoa2202707'},
+  clovers2023:{a:'volumen',tag:'Landmark',short:'CLOVERS 2023',autores:'NHLBI PETAL Network (Shapiro NI, et al.)',titulo:'Early Restrictive or Liberal Fluid Management for Sepsis-Induced Hypotension',rev:'N Engl J Med 2023;388(6):499-510',id:'PMID 36688507 · DOI 10.1056/NEJMoa2212663',hz:'Tras 1-3 L, restrictivo (vasopresor precoz) = liberal (14.0% vs 14.9%). Los 30 mL/kg son PISO, no meta rígida.',url:'https://doi.org/10.1056/NEJMoa2212663'},
+  // — Fluidos: tipo —
+  smart2018:{a:'tipo',tag:'Landmark',short:'SMART 2018',autores:'Semler MW, Self WH, et al.',titulo:'Balanced Crystalloids versus Saline in Critically Ill Adults',rev:'N Engl J Med 2018;378(9):829-839',id:'PMID 29485925 · DOI 10.1056/NEJMoa1711584',hz:'Balanceados < salino en MAKE30 (14.3% vs 15.4%, OR 0.91). Efecto modesto.',url:'https://doi.org/10.1056/NEJMoa1711584'},
+  basics2021:{a:'tipo',tag:'Landmark',short:'BaSICS 2021',autores:'Zampieri FG, Machado FR, et al.',titulo:'Effect of Balanced Solution vs Saline on Mortality in Critically Ill Patients (BaSICS)',rev:'JAMA 2021;326(9):818-829',id:'PMID 34375394 · DOI 10.1001/jama.2021.11684',hz:'Balanceados vs salino: neutral (26.4% vs 27.2%).',url:'https://doi.org/10.1001/jama.2021.11684'},
+  plus2022:{a:'tipo',tag:'Landmark',short:'PLUS 2022',autores:'Finfer S, Micallef S, et al.',titulo:'Balanced Multielectrolyte Solution versus Saline in Critically Ill Adults',rev:'N Engl J Med 2022;386(9):815-826',id:'PMID 35041780 · DOI 10.1056/NEJMoa2114464',hz:'Balanceados vs salino: neutral (21.8% vs 22.0%).',url:'https://doi.org/10.1056/NEJMoa2114464'},
+  // — Vasopresores / meta de PAM —
+  soap2010:{a:'presor',tag:'Landmark',short:'SOAP II 2010',autores:'De Backer D, Biston P, Devriendt J, et al.',titulo:'Comparison of Dopamine and Norepinephrine in the Treatment of Shock',rev:'N Engl J Med 2010;362(9):779-789',id:'PMID 20200382 · DOI 10.1056/NEJMoa0907118',hz:'Noradrenalina vs dopamina: menos arritmias → NA de 1ª línea.',url:'https://doi.org/10.1056/NEJMoa0907118'},
+  vasst2008:{a:'presor',tag:'Landmark',short:'VASST 2008',autores:'Russell JA, Walley KR, Singer J, et al.',titulo:'Vasopressin versus Norepinephrine Infusion in Patients with Septic Shock',rev:'N Engl J Med 2008;358(9):877-887',id:'PMID 18305265 · DOI 10.1056/NEJMoa067373',hz:'Vasopresina añadida a NA: sin reducción de mortalidad global (coadyuvante).',url:'https://doi.org/10.1056/NEJMoa067373'},
+  censer2019:{a:'presor',tag:'Landmark',short:'CENSER 2019',autores:'Permpikul C, Tongyoo S, Viarasilpa T, et al.',titulo:'Early Use of Norepinephrine in Septic Shock Resuscitation (CENSER)',rev:'Am J Respir Crit Care Med 2019;199(9):1097-1105',id:'PMID 30704260 · DOI 10.1164/rccm.201806-1034OC',hz:'Noradrenalina precoz: más control del shock a las 6 h.',url:'https://doi.org/10.1164/rccm.201806-1034OC'},
+  sepsispam2014:{a:'presor',tag:'Landmark',short:'SEPSISPAM 2014',autores:'Asfar P, Meziani F, Hamel JF, et al.',titulo:'High versus Low Blood-Pressure Target in Patients with Septic Shock',rev:'N Engl J Med 2014;370(17):1583-1593',id:'PMID 24635770 · DOI 10.1056/NEJMoa1312173',hz:'Meta PAM 80-85 vs 65-70: sin reducción de mortalidad → meta 65 basta.',url:'https://doi.org/10.1056/NEJMoa1312173'},
+  // — Corticoides —
+  adrenal2018:{a:'cortico',tag:'Landmark',short:'ADRENAL 2018',autores:'Venkatesh B, Finfer S, Cohen J, et al.',titulo:'Adjunctive Glucocorticoid Therapy in Patients with Septic Shock',rev:'N Engl J Med 2018;378(9):797-808',id:'PMID 29347874 · DOI 10.1056/NEJMoa1705835',hz:'Hidrocortisona: sin ↓ mortalidad a 90 d, pero el shock revierte más rápido.',url:'https://doi.org/10.1056/NEJMoa1705835'},
+  aprocchss2018:{a:'cortico',tag:'Landmark',short:'APROCCHSS 2018',autores:'Annane D, Renault A, Brun-Buisson C, et al.',titulo:'Hydrocortisone plus Fludrocortisone for Adults with Septic Shock',rev:'N Engl J Med 2018;378(9):809-818',id:'PMID 29490185 · DOI 10.1056/NEJMoa1705716',hz:'Hidrocortisona + fludrocortisona: SÍ bajó mortalidad a 90 d. Contrasta con ADRENAL.',url:'https://doi.org/10.1056/NEJMoa1705716'},
+  // — Procalcitonina —
+  saps2016:{a:'pct',tag:'Landmark',short:'SAPS 2016',autores:'de Jong E, van Oers JA, Beishuizen A, et al.',titulo:'Efficacy and safety of procalcitonin guidance in reducing the duration of antibiotic treatment',rev:'Lancet Infect Dis 2016;16(7):819-827',id:'PMID 26947523 · DOI 10.1016/S1473-3099(16)00053-0',hz:'La guía por procalcitonina acorta la duración del antibiótico con seguridad.',url:'https://doi.org/10.1016/S1473-3099(16)00053-0'}
+};
+const REF_AREAS = [
+  ['ancla','Anclajes · guías madre'],['cribado','Cribado y definiciones'],['atb','Antibiótico · timing'],
+  ['cultivo','Hemocultivos'],['lactato','Lactato y perfusión'],['volumen','Fluidos · volumen y estrategia'],
+  ['tipo','Fluidos · tipo'],['presor','Vasopresores y meta de PAM'],['cortico','Corticoides'],['pct','Procalcitonina']
+];
+function openRefModal(key){
+  var r = REFS[key]; if(!r) return;
+  document.getElementById('rm-tag').textContent = r.tag;
+  document.getElementById('rm-short').textContent = r.short;
+  document.getElementById('rm-aut').textContent = r.autores;
+  document.getElementById('rm-tit').textContent = r.titulo;
+  document.getElementById('rm-rev').textContent = r.rev;
+  document.getElementById('rm-id').textContent = r.id;
+  document.getElementById('rm-hz').textContent = r.hz;
+  var a = document.getElementById('rm-link'); a.href = r.url;
+  document.getElementById('refModal').style.display = 'flex';
+}
+function closeRefModal(){ document.getElementById('refModal').style.display = 'none'; }
+/* cita clicable: <a class="cite" onclick="rc('key')">texto</a> */
+function rc(key){ openRefModal(key); return false; }
+function renderRefList(){
+  var box = document.getElementById('ref-list'); if(!box) return;
+  var html = '';
+  REF_AREAS.forEach(function(grp){
+    var keys = Object.keys(REFS).filter(function(k){ return REFS[k].a === grp[0]; });
+    if(!keys.length) return;
+    html += '<div class="ref-group">'+grp[1]+'</div>';
+    keys.forEach(function(k){
+      var r = REFS[k];
+      html += '<div class="ref-row" onclick="openRefModal(\''+k+'\')">'+
+        '<span class="ref-badge b-'+r.a+'">'+r.tag+'</span>'+
+        '<span class="ref-txt"><b>'+r.short+'</b> · '+r.rev+'<span class="ref-hz">'+r.hz+'</span></span></div>';
+    });
+  });
+  box.innerHTML = html + '<div class="ref-count">'+Object.keys(REFS).length+' referencias · cada PMID/DOI verificado en fuente</div>';
+}
+
+/* ---------- Práctica: casos que cargan el tablero ---------- */
+const CASES = {
+  c1:{ titulo:'Shock séptico por neumonía · 68 a',
+    vineta:'Hombre de 68 años, tos y fiebre 3 días, hoy somnoliento e hipotenso. FR 32, SpO₂ 89% con O₂, PA 82/48, FC 124, T 38,9 °C, confuso. Glucosa 212.',
+    load:{ scale:1, n_rr:32, n_spo2:89, n_o2:'o2', n_sbp:82, n_hr:124, n_temp:38.9, n_avpu:'CVPU',
+      q_rr:true, q_gcs:true, q_sbp:true, g_edad:68, g_glu:212,
+      sf_pf:220, sf_sup:false, sf_plt:90, sf_bili:1.5, sf_map:60, sf_vaso:'none', sf_gcs:13, sf_cr:1.8 },
+    conducta:'<b>Es shock séptico</b> (hipotensión + hipoperfusión). NEWS2 muy alto, qSOFA 3. Primera hora: hemocultivos + lactato <b>antes</b> del antibiótico (<a class="cite" onclick="rc(\'cheng2019\')">FABLED</a>); <b>antibiótico &lt;1 h</b> por antibiograma local (<a class="cite" onclick="rc(\'kumar2006\')">Kumar</a>); cristaloides ~30 mL/kg reevaluando; <b>noradrenalina precoz</b> para PAM ≥65 (<a class="cite" onclick="rc(\'soap2010\')">SOAP II</a>, <a class="cite" onclick="rc(\'sepsispam2014\')">SEPSISPAM</a>); glucosa ≥180 → insulina. La categoría "shock" la pusiste tú; la app no la infiere.' },
+  c2:{ titulo:'Sepsis urinaria sin shock · 79 a',
+    vineta:'Mujer de 79 años, disuria y fiebre, decaída pero orientada. FR 24, SpO₂ 93% aire, PA 108/64, FC 106, T 38,6 °C, alerta. Glucosa 150.',
+    load:{ scale:1, n_rr:24, n_spo2:93, n_o2:'air', n_sbp:108, n_hr:106, n_temp:38.6, n_avpu:'A',
+      q_rr:true, q_gcs:false, q_sbp:false, g_edad:79, g_glu:150,
+      sf_pf:'', sf_sup:false, sf_plt:140, sf_bili:'', sf_map:78, sf_vaso:'none', sf_gcs:15, sf_cr:1.3 },
+    conducta:'<b>Sepsis probable sin shock.</b> NEWS2 ≥5 (revisión urgente), qSOFA 1 — recuerda: qSOFA es poco sensible, no te fíes de él para descartar (<a class="cite" onclick="rc(\'fernando2018\')">Fernando</a>). Primera hora: hemocultivos + lactato; <b>antibiótico &lt;1 h</b> por ser sepsis probable (<a class="cite" onclick="rc(\'ferrer2014\')">Ferrer</a>); fluidos si hay hipoperfusión (reevaluando); vigilancia estrecha. Aún no necesita vasopresor.' },
+  c3:{ titulo:'Sospecha, sin shock · 30 a',
+    vineta:'Hombre de 30 años, odinofagia y fiebre, buen estado general. FR 22, SpO₂ 96% aire, PA 122/76, FC 98, T 38,4 °C, alerta. Glucosa 120.',
+    load:{ scale:1, n_rr:22, n_spo2:96, n_o2:'air', n_sbp:122, n_hr:98, n_temp:38.4, n_avpu:'A',
+      q_rr:true, q_gcs:false, q_sbp:false, g_edad:30, g_glu:120,
+      sf_pf:'', sf_sup:false, sf_plt:'', sf_bili:'', sf_map:90, sf_vaso:'none', sf_gcs:15, sf_cr:'' },
+    conducta:'<b>Infección posible, baja probabilidad de sepsis.</b> NEWS2 bajo, sin disfunción orgánica. Aquí el tutor <b>se abstiene del label</b> y enseña a no sobre-tratar: si la probabilidad es baja, la guía permite <b>diferir el antibiótico y reevaluar</b> (hasta 3 h desde el triaje) en vez de disparar (<a class="cite" onclick="rc(\'churpek2017\')">Churpek</a>). El juicio clínico manda.' }
+};
+function loadCase(id){
+  var c = CASES[id]; if(!c) return; var L = c.load;
+  if(L.scale) setScale(L.scale);
+  ['n_rr','n_spo2','n_sbp','n_hr','n_temp','g_edad','g_glu','sf_pf','sf_plt','sf_bili','sf_map','sf_gcs','sf_cr'].forEach(function(k){
+    if(k in L){ var e=document.getElementById(k); if(e) e.value = L[k]; }
+  });
+  ['n_o2','n_avpu','sf_vaso'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value = L[k]; } });
+  ['q_rr','q_gcs','q_sbp'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.checked = !!L[k]; } });
+  if('sf_sup' in L){ var s=document.getElementById('sf_sup'); if(s) s.checked = !!L.sf_sup; }
+  calcNews(); calcQsofa(); calcPam(); calcGlu(); calcSofa();
+  window.scrollTo({top:0, behavior:'smooth'});
+  var t = document.getElementById('case-toast');
+  if(t){ t.style.display='block'; clearTimeout(window._ctto); window._ctto=setTimeout(function(){t.style.display='none';},3500); }
+}
+function toggleConducta(id){
+  var d = document.getElementById('cd-'+id);
+  d.style.display = (d.style.display==='block') ? 'none' : 'block';
+}
+function renderCases(){
+  var box = document.getElementById('case-list'); if(!box) return;
+  var html = '';
+  Object.keys(CASES).forEach(function(k){
+    var c = CASES[k];
+    html += '<div class="case-card"><div class="case-tit">'+c.titulo+'</div>'+
+      '<div class="case-vin">'+c.vineta+'</div>'+
+      '<div class="case-actions"><button class="case-load" onclick="loadCase(\''+k+'\')">↙ Cargar en el tablero</button>'+
+      '<button class="case-toggle" onclick="toggleConducta(\''+k+'\')">Ver conducta ▾</button></div>'+
+      '<div class="case-reveal" id="cd-'+k+'">'+c.conducta+'</div></div>';
+  });
+  box.innerHTML = '<div id="case-toast" class="case-toast">✓ Caso cargado — mira el tablero (arriba a la izquierda)</div>' + html;
+}
+
 /* ---------- Tabs ---------- */
 function showTab(id, btn){
   document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
@@ -886,6 +1064,8 @@ function showTab(id, btn){
 }
 calcQsofa();
 calcSofa();
+renderRefList();
+renderCases();
 </script>
 </body>
 </html>
