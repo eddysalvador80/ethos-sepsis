@@ -186,6 +186,28 @@ body {
 .contro h3 { font-size: 14px; margin-bottom: 6px; color: var(--text); }
 .contro p { font-size: 13px; color: var(--text-dim); }
 
+/* ---- Capa docente "Aprender" (mini-curso) ---- */
+.learn-index { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 18px; }
+.learn-index a { font-size: 11.5px; text-decoration: none; color: var(--info); border: 1px solid var(--info-border); background: var(--info-bg); border-radius: 20px; padding: 4px 11px; }
+.learn-index a:hover { background: var(--info); color: #fff; }
+.learn-sec { font-size: 16px; font-weight: 700; color: var(--text); margin: 26px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); scroll-margin-top: 12px; }
+.learn-lead { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.55; }
+.tool-card { background: var(--bg-elev); border: 1px solid var(--border); border-left: 3px solid var(--info); border-radius: 10px; padding: 13px 16px; margin-bottom: 11px; }
+.tool-card h4 { font-size: 14px; margin-bottom: 9px; color: var(--text); }
+.tool-card dl { display: grid; grid-template-columns: 92px 1fr; gap: 5px 10px; font-size: 12.5px; margin: 0; }
+.tool-card dt { color: var(--text-mute); font-weight: 700; }
+.tool-card dd { color: var(--text-dim); margin: 0; }
+.step { display: flex; gap: 12px; padding: 11px 2px; border-top: 1px solid var(--border-soft); }
+.step:first-of-type { border-top: none; }
+.step .n { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex: none; }
+.step .b { font-size: 13px; line-height: 1.5; }
+.step .b .do { font-weight: 600; color: var(--text); }
+.step .b .why { color: var(--text-dim); }
+.gloss { columns: 2; column-gap: 22px; }
+.gloss div { break-inside: avoid; margin-bottom: 9px; font-size: 12.5px; color: var(--text-dim); }
+.gloss b { color: var(--text); }
+@media (max-width: 640px) { .gloss { columns: 1; } .tool-card dl { grid-template-columns: 80px 1fr; } }
+
 .timing-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
 .timing-table th, .timing-table td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--border-soft); }
 .timing-table th { color: var(--text-mute); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
@@ -544,13 +566,118 @@ body {
 
     <!-- ===== APRENDER ===== -->
     <div class="tab-panel" id="tab-aprender">
-      <div class="note-box"><b>Por qué este tutor es chico en el núcleo.</b> La sepsis casi no tiene números duros: casi todo es un gatillo condicional que presupone juicio clínico. Por eso el núcleo determinista es solo scores + gatillos de proceso + meta PAM + gatillo glicemia. Todo lo demás se enseña o se deriva.</div>
+      <div class="note-box"><b>Cómo usar esta sección.</b> Aquí aprendes de cero: qué es la sepsis, qué significa cada score, y —sobre todo— <b>qué hacer</b> ante una sospecha o un caso confirmado en la primera hora. El tablero de la izquierda <i>calcula</i>; esto te enseña el <i>porqué</i>. Cada afirmación lleva su fuente.</div>
+      <div class="learn-index">
+        <a href="#l1">1 · ¿Qué es la sepsis?</a>
+        <a href="#l2">2 · Las herramientas</a>
+        <a href="#l3">3 · La primera hora, paso a paso</a>
+        <a href="#l4">4 · Lo que cambió</a>
+        <a href="#l5">5 · Glosario</a>
+      </div>
 
+      <!-- §1 -->
+      <h3 class="learn-sec" id="l1">1 · ¿Qué es la sepsis?</h3>
+      <p class="learn-lead">La <b>sepsis</b> no es "una infección grave" a secas. Es cuando la <b>respuesta del propio cuerpo</b> a una infección se desregula y empieza a <b>dañar sus órganos</b>. El daño lo hace la reacción, no solo el germen — por eso un paciente puede verse "solo con fiebre" y estar entrando en falla orgánica.</p>
+      <div class="tool-card">
+        <h4>Las dos definiciones que debes manejar</h4>
+        <dl>
+          <dt>Sepsis</dt><dd>Disfunción orgánica potencialmente mortal por una respuesta desregulada del huésped a la infección (<a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a>). Operacionalmente: infección + aumento agudo del SOFA ≥2.</dd>
+          <dt>Shock séptico</dt><dd>El subgrupo más grave: sepsis que, <b>pese a fluidos</b>, necesita <b>vasopresores</b> para mantener PAM ≥65 mmHg <b>y</b> tiene <b>lactato &gt;2 mmol/L</b> (<a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a>). Mortalidad mucho mayor.</dd>
+          <dt>Por qué corre</dt><dd>El daño orgánico avanza hora a hora. Reconocer y reanimar temprano cambia el desenlace: por eso todo el foco está en la <b>primera hora</b>.</dd>
+        </dl>
+      </div>
+
+      <!-- §2 -->
+      <h3 class="learn-sec" id="l2">2 · Las herramientas, explicadas</h3>
+      <p class="learn-lead">Cuatro scores que se confunden todo el tiempo. No miden lo mismo ni sirven para lo mismo. Aquí, cada uno: <b>qué es · qué mide · cuándo se usa · su límite</b>.</p>
+
+      <div class="tool-card">
+        <h4><span class="type-tag tag-D">D</span> SIRS <span style="font-weight:400;color:var(--text-mute)">— el detector de inflamación</span></h4>
+        <dl>
+          <dt>Qué es</dt><dd>El semáforo más antiguo y <b>sensible</b>: detecta inflamación, venga o no de una infección.</dd>
+          <dt>Qué mide</dt><dd><b>≥2 de 4:</b> Temperatura &gt;38 o &lt;36 °C · FC &gt;90 · FR &gt;20 (o PaCO₂ &lt;32) · leucocitos &gt;12.000, &lt;4.000 o &gt;10% baldas.</dd>
+          <dt>Cuándo</dt><dd>Cribado (junto a NEWS2). Muy sensible: rara vez deja pasar al enfermo.</dd>
+          <dt>Su límite</dt><dd>Poco específico: se dispara con cualquier inflamación (trauma, cirugía, pancreatitis…), no solo con sepsis.</dd>
+          <dt>Fuente</dt><dd>ACCP/SCCM, Bone 1992 (<a class="cite" href="https://www.ncbi.nlm.nih.gov/books/NBK547669/" target="_blank">criterios, StatPearls</a>).</dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4><span class="type-tag tag-D">D</span> qSOFA <span style="font-weight:400;color:var(--text-mute)">— el "SOFA de cabecera", que quedó fuera del cribado</span></h4>
+        <dl>
+          <dt>Qué es</dt><dd>Versión rápida del SOFA, <b>sin laboratorio</b>, pensada para detectar riesgo fuera de la UCI (3 signos de cabecera).</dd>
+          <dt>Qué mide</dt><dd><b>≥2 de 3:</b> FR ≥22 · alteración mental (Glasgow ≤14) · PAS ≤100.</dd>
+          <dt>Cuándo</dt><dd>Nació como cribado, pero la <a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC 2026 ya NO lo recomienda</a> como herramienta única de cribado. Se calcula aquí solo para <b>entender el cambio</b>.</dd>
+          <dt>Su límite</dt><dd>Baja <b>sensibilidad</b>: se positiviza <b>tarde</b>, cuando el paciente ya está grave → deja pasar sépticos temprano.</dd>
+          <dt>Fuente</dt><dd><a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a>; SSC 2026 #4.</dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4><span class="type-tag tag-D">D</span> NEWS2 <span style="font-weight:400;color:var(--text-mute)">— el cribado preferido hoy</span></h4>
+        <dl>
+          <dt>Qué es</dt><dd>Score de <b>alerta temprana</b> del deterioro clínico. No es específico de sepsis, pero es el <b>preferido para cribarla</b>.</dd>
+          <dt>Qué mide</dt><dd>7 signos: FR, SpO₂, O₂ suplementario, PAS, FC, temperatura y conciencia. Es el tablero de la izquierda.</dd>
+          <dt>Cuándo</dt><dd>Cribado de entrada (SSC 2026 lo recomienda <b>sobre</b> qSOFA). <b>≥5</b> = revisión urgente · <b>≥7</b> = emergencia · un solo parámetro en 3 también alerta.</dd>
+          <dt>Su límite</dt><dd>No específico: se activa con cualquier deterioro, no solo sepsis (por eso: siempre + sospecha de infección).</dd>
+          <dt>Fuente</dt><dd><a class="cite" href="https://www.rcp.ac.uk/media/a4ibkkbf/news2-final-report_0_0.pdf" target="_blank">RCP 2017</a>; SSC 2026 #4.</dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4><span class="type-tag tag-D">D</span> SOFA <span style="font-weight:400;color:var(--text-mute)">— el termómetro de la falla orgánica (pronóstico, NO gatillo)</span></h4>
+        <dl>
+          <dt>Qué es</dt><dd>Cuantifica <b>cuán mal</b> están 6 órganos. Es el que <b>define disfunción orgánica</b> en la definición de sepsis.</dd>
+          <dt>Qué mide</dt><dd>6 sistemas (respiración, coagulación, hígado, cardiovascular, SNC, renal), 0–4 cada uno; total 0–24. Un aumento agudo <b>≥2</b> = disfunción orgánica.</dd>
+          <dt>Cuándo</dt><dd>Cuantificación / pronóstico. <b>NO es un gatillo de la primera hora</b>: su ausencia no debe paralizar (se actúa por sospecha + bedside). Calculadora en el eslabón 6.</dd>
+          <dt>Su límite</dt><dd>Necesita laboratorio y dice "cuán grave", no "qué hacer".</dd>
+          <dt>Fuente</dt><dd><a class="cite" href="https://doi.org/10.1007/BF01709751" target="_blank">Vincent 1996</a>; <a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a>.</dd>
+        </dl>
+      </div>
+
+      <!-- §3 -->
+      <h3 class="learn-sec" id="l3">3 · La primera hora, paso a paso — ¿qué hago?</h3>
+      <p class="learn-lead">Dos entradas, un mismo hilo: sea que <b>sospechas</b> sepsis o que ya la <b>confirmaste</b>, la secuencia es la misma — cambia la <b>urgencia del antibiótico</b> según la gravedad. La app calcula y gatilla lo objetivo; <b>la categoría (¿shock? ¿probable?) y las dosis las pones tú</b>.</p>
+      <div class="eslabon">
+        <div class="step"><div class="n">1</div><div class="b"><span class="do">Sospecha y criba.</span> Todo paciente con infección (o foco probable) + deterioro. Criba con <b>NEWS2/SIRS</b>, no con qSOFA. Gatillo en urgencias: qSOFA≥2 <b>o</b> SIRS≥2 <b>o</b> NEWS2≥5. <span class="why">Por qué: detectar temprano salva; qSOFA solo avisa tarde.</span></div></div>
+        <div class="step"><div class="n">2</div><div class="b"><span class="do">Estima gravedad.</span> ¿Hay disfunción orgánica (SOFA↑≥2) o <b>shock</b> (necesita vasopresor + lactato&gt;2)? <span class="why">Por qué: define cuán rápido debe entrar el antibiótico. Esta categoría es juicio tuyo, la app no la infiere.</span></div></div>
+        <div class="step"><div class="n">3</div><div class="b"><span class="do">Activa.</span> Da el aviso / código sepsis según el protocolo de tu servicio. <span class="why">Por qué: la sepsis es tiempo-dependiente y de equipo, no de una sola persona.</span></div></div>
+        <div class="step"><div class="n">4</div><div class="b"><span class="do">Obtén.</span> <b>2 hemocultivos ANTES</b> del antibiótico (si no lo retrasan &gt;45 min) + <b>lactato</b> (y repítelo). <span class="why">Por qué: el antibiótico esteriliza los cultivos en minutos; el lactato marca hipoperfusión y su tendencia.</span></div></div>
+        <div class="step"><div class="n">5</div><div class="b"><span class="do">Antibiótico, según gravedad.</span> Shock o sepsis probable → <b>dentro de 1 h</b>. Infección posible sin shock → hasta <b>3 h</b> (desde el triaje). Baja probabilidad → diferir y reevaluar. La <b>molécula y dosis = antibiograma local</b>. <span class="why">Por qué: en shock cada hora cuenta; sin shock, apurar de más lleva a sobretratar.</span></div></div>
+        <div class="step"><div class="n">6</div><div class="b"><span class="do">Reanima.</span> Si hipotensión o lactato &gt;2: cristaloides (~30 mL/kg, <b>reevaluando</b>, no a ciegas). Meta <b>PAM ≥65</b> (60–65 si ≥65 años). Si no responde: <b>noradrenalina</b> 1ª línea. <span class="why">Por qué: restaurar perfusión — pero el exceso de fluido también daña; por eso se reevalúa.</span></div></div>
+        <div class="step"><div class="n">7</div><div class="b"><span class="do">Controla el foco.</span> Drena o remueve la fuente (absceso, catéter, obstrucción), idealmente &lt;6 h. <span class="why">Por qué: sin control del foco, el antibiótico no basta.</span></div></div>
+        <div class="step"><div class="n">8</div><div class="b"><span class="do">Reevalúa y traslada.</span> Lactato de control, respuesta hemodinámica; UCI según juicio y recursos. <span class="why">Por qué: la primera hora abre el manejo, no lo cierra.</span></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px"><b>Lo que la app NUNCA hace</b> (y por qué es docente, no dispositivo): no estampa el diagnóstico "es sepsis", no da un reloj de antibiótico por paciente, no ordena volumen ni dosis. Eso es tuyo — mira la pestaña <b>Derivaciones</b>.</div>
+
+      <!-- §4 -->
+      <h3 class="learn-sec" id="l4">4 · Lo que cambió / controversias</h3>
       <div class="contro"><h3>1 · qSOFA salió como cribado</h3><p>La SSC 2026 recomienda NEWS/NEWS2/SIRS <b>sobre</b> qSOFA para cribar (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#4</a>). qSOFA sigue útil para enseñar, pero ya no es la puerta de entrada.</p></div>
       <div class="contro"><h3>2 · Timing del antibiótico estratificado</h3><p>No "1 hora para todos": la guía 2026 estratifica por certeza y gravedad (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#16–#20</a>). Shock &lt;1h; posible sin shock hasta 3h; baja probabilidad, diferir.</p></div>
       <div class="contro"><h3>3 · 30 mL/kg es condicional</h3><p>Señal de daño con resucitación liberal en entornos de bajos recursos, y aparición de la <b>de-resucitación</b> (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#89</a>): la guía se aleja del volumen fijo liberal. Por eso el 30 mL/kg no es orden.</p></div>
       <div class="contro"><h3>4 · Código sepsis: condicional vs programa de mejora</h3><p>El "código sepsis" como intervención es condicional (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#2</a>), pero el programa de mejora de calidad es recomendación fuerte (#1). Lo primero deriva al protocolo local.</p></div>
       <div class="contro"><h3>5 · El contexto chileno: qSOFA fuera del cribado</h3><p>Afuera <b>y</b> en Chile el cribado se aleja de qSOFA. La <b>SSC 2026</b> recomienda NEWS2/SIRS sobre qSOFA (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#4</a>). Y la <b>SOCHIMI</b>, en declaración de su Directorio, <b>disiente de Sepsis-3</b> —lo juzga potencialmente riesgoso para países en desarrollo, donde el problema es la baja <i>sensibilidad</i> para detectar al séptico, no la especificidad— y conserva <b>SIRS</b> para el cribado (<a class="cite" href="https://medicina-intensiva.cl/post.php?id=1000140" target="_blank">Declaración SOCHIMI</a>). Incluso lineamientos MINSAL recientes siguen operando con SIRS. Por eso esta app criba con <b>NEWS2/SIRS, no con qSOFA</b>: es lo alineado con la realidad chilena, no una preferencia de diseño.</p></div>
+
+      <!-- §5 -->
+      <h3 class="learn-sec" id="l5">5 · Glosario</h3>
+      <div class="gloss">
+        <div><b>Sepsis</b> — disfunción orgánica potencialmente mortal por respuesta desregulada a una infección.</div>
+        <div><b>Shock séptico</b> — sepsis que, pese a fluidos, requiere vasopresores para PAM ≥65 y tiene lactato &gt;2 mmol/L.</div>
+        <div><b>SIRS</b> — respuesta inflamatoria sistémica; ≥2 de 4 (temperatura, FC, FR/PaCO₂, leucocitos). Sensible, poco específico.</div>
+        <div><b>qSOFA</b> — quick SOFA; ≥2 de 3 (FR ≥22, Glasgow ≤14, PAS ≤100). Ya no se usa como cribado.</div>
+        <div><b>NEWS2</b> — National Early Warning Score 2; score de deterioro de 7 signos. Cribado preferido; ≥5 urgente, ≥7 emergencia.</div>
+        <div><b>SOFA</b> — puntaje de disfunción de 6 órganos (0–24). Pronóstico, no gatillo.</div>
+        <div><b>PAM</b> — presión arterial media; meta ≥65 mmHg (60–65 si ≥65 años).</div>
+        <div><b>Lactato</b> — marcador de hipoperfusión; se usa su <b>tendencia</b> (seriado), no un umbral fijo.</div>
+        <div><b>Aclaramiento de lactato</b> — descenso del lactato con la reanimación; no hay un % de corte de guía.</div>
+        <div><b>Control de foco</b> — drenar/remover la fuente de la infección (absceso, catéter, obstrucción).</div>
+        <div><b>De-resucitación</b> — retirar activamente el exceso de fluido tras la fase aguda.</div>
+        <div><b>Cristaloides balanceados</b> — sueros con electrolitos similares al plasma; preferidos sobre el salino 0,9%.</div>
+        <div><b>Vasopresor</b> — fármaco que sube la presión (noradrenalina = 1ª línea en shock séptico).</div>
+        <div><b>Procalcitonina</b> — biomarcador; no debe decidir por sí solo si iniciar antibiótico.</div>
+        <div><b>MDR</b> — multirresistente; cubrir empíricamente solo si hay factores de riesgo.</div>
+        <div><b>Código sepsis</b> — activación protocolizada del equipo; deriva al protocolo local de tu servicio.</div>
+      </div>
     </div>
 
     <!-- ===== DERIVACIONES ===== -->
