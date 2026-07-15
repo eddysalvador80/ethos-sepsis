@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETHOS · Sepsis — Tutor primera hora v1.0</title>
+<meta name="theme-color" content="#0e1014">
+<style>
+:root {
+  --bg: #f3f5f8;
+  --bg-elev: #ffffff;
+  --bg-elev2: #eceff4;
+  --bg-elev3: #e3e8ef;
+  --border: #d2d9e2;
+  --border-soft: #e4e9f0;
+  --text: #1b2230;
+  --text-dim: #545e70;
+  --text-mute: #8a94a3;
+
+  --critical: #cf3a39;
+  --critical-bg: rgba(207, 58, 57, 0.09);
+  --critical-border: rgba(207, 58, 57, 0.32);
+  --attention: #b9760c;
+  --attention-bg: rgba(185, 118, 12, 0.10);
+  --attention-border: rgba(185, 118, 12, 0.32);
+  --info: #2f7bc4;
+  --info-bg: rgba(47, 123, 196, 0.09);
+  --info-border: rgba(47, 123, 196, 0.32);
+  --ok: #0d7a52;
+  --ok-bg: rgba(13, 122, 82, 0.10);
+  --ok-border: rgba(13, 122, 82, 0.32);
+
+  --accent: #9a7426;
+  --plan: #0d9488;
+  --plan-bg: rgba(13, 148, 136, 0.09);
+  --plan-border: rgba(13, 148, 136, 0.30);
+
+  /* Tipos del codebook */
+  --tD: #2f7bc4;   /* Determinista */
+  --tT: #0d9488;   /* Docente */
+  --tA: #b9760c;   /* Abstención */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(201, 167, 107, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(59, 130, 246, 0.03) 0%, transparent 40%);
+}
+
+.app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+}
+
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-family: Georgia, 'Times New Roman', serif; font-size: 27px; font-weight: 600; letter-spacing: -0.5px; }
+.logo span { color: var(--accent); font-style: italic; }
+.subtitle { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 11px; color: var(--text-mute); letter-spacing: 0.5px; text-transform: uppercase; }
+
+.badge-docente {
+  font-family: ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.5px;
+  color: var(--accent); border: 1px solid var(--accent); border-radius: 20px;
+  padding: 3px 10px; text-transform: uppercase; white-space: nowrap;
+}
+
+/* ---------- Panel izquierdo: tablero primera hora ---------- */
+.board { display: flex; flex-direction: column; gap: 14px; }
+.card {
+  background: var(--bg-elev); border: 1px solid var(--border);
+  border-radius: 10px; padding: 15px 16px;
+}
+.card h3 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.type-tag {
+  font-family: ui-monospace, Menlo, monospace; font-size: 9px; font-weight: 700;
+  padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px;
+}
+.tag-D { background: var(--info-bg); color: var(--tD); border: 1px solid var(--info-border); }
+.tag-T { background: var(--plan-bg); color: var(--tT); border: 1px solid var(--plan-border); }
+.tag-A { background: var(--attention-bg); color: var(--tA); border: 1px solid var(--attention-border); }
+
+.field { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+.field label { font-size: 12.5px; color: var(--text-dim); flex: 1; }
+.field input[type=number], .field select {
+  width: 92px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg-elev2); color: var(--text); font-size: 13px; font-family: inherit;
+}
+.field.check { justify-content: flex-start; }
+.field.check input { width: 16px; height: 16px; accent-color: var(--tD); }
+.field.check label { flex: none; }
+
+.score-line {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);
+}
+.score-num { font-size: 26px; font-weight: 700; font-family: ui-monospace, Menlo, monospace; }
+.score-flag { font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 6px; }
+.flag-ok { background: var(--ok-bg); color: var(--ok); }
+.flag-warn { background: var(--attention-bg); color: var(--attention); }
+.flag-crit { background: var(--critical-bg); color: var(--critical); }
+
+.receipt {
+  font-size: 11px; color: var(--text-mute); margin-top: 9px; line-height: 1.45;
+  border-left: 2px solid var(--border); padding-left: 9px;
+}
+.receipt b { color: var(--text-dim); }
+.mini-note { font-size: 11.5px; color: var(--text-dim); margin-top: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.seg button {
+  background: var(--bg-elev2); border: none; padding: 5px 10px; font-size: 11px;
+  color: var(--text-dim); cursor: pointer; font-family: inherit;
+}
+.seg button.on { background: var(--tD); color: #fff; }
+
+/* ---------- Panel derecho: pestañas ---------- */
+.main-tabs { display: flex; gap: 0; background: var(--bg-elev2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 16px; flex-wrap: wrap; }
+.main-tab {
+  background: transparent; border: none; color: var(--text-dim);
+  font-family: ui-monospace, Menlo, monospace; font-size: 11px; padding: 11px 18px;
+  cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; transition: all .15s;
+}
+.main-tab:hover { background: var(--bg-elev3); color: var(--text); }
+.main-tab.active { background: var(--bg-elev); color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.eslabon {
+  background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 14px;
+}
+.eslabon-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.eslabon-num {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none;
+}
+.eslabon-head h2 { font-size: 16px; font-weight: 600; }
+.decision { padding: 11px 0; border-top: 1px solid var(--border-soft); }
+.decision:first-of-type { border-top: none; }
+.decision-title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; margin-bottom: 4px; flex-wrap: wrap; }
+.decision-note { font-size: 12.5px; color: var(--text-dim); }
+.decision .receipt { margin-top: 6px; }
+
+.cite { color: var(--info); text-decoration: none; border-bottom: 1px dotted var(--info); }
+.cite:hover { background: var(--info-bg); }
+
+.prohib {
+  background: var(--critical-bg); border: 1px solid var(--critical-border);
+  border-radius: 10px; padding: 15px 18px; margin-bottom: 14px;
+}
+.prohib h2 { color: var(--critical); font-size: 15px; margin-bottom: 10px; }
+.prohib ol { margin-left: 18px; }
+.prohib li { margin-bottom: 6px; font-size: 13.5px; }
+
+.derivcard {
+  background: var(--bg-elev); border: 1px solid var(--attention-border); border-left: 4px solid var(--attention);
+  border-radius: 8px; padding: 13px 15px; margin-bottom: 11px;
+}
+.derivcard .out { font-weight: 600; font-size: 13.5px; }
+.derivcard .to { font-size: 12.5px; color: var(--text-dim); margin-top: 3px; }
+.derivcard .to b { color: var(--attention); }
+
+.contro { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 15px 18px; margin-bottom: 13px; }
+.contro h3 { font-size: 14px; margin-bottom: 6px; color: var(--text); }
+.contro p { font-size: 13px; color: var(--text-dim); }
+
+.timing-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+.timing-table th, .timing-table td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--border-soft); }
+.timing-table th { color: var(--text-mute); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+.timing-table td.strong { font-weight: 600; }
+
+.refblock { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 15px 18px; margin-bottom: 13px; }
+.refblock h3 { font-size: 14px; margin-bottom: 5px; }
+.refblock .meta { font-size: 12px; color: var(--text-dim); }
+.refblock .quote { font-size: 12px; color: var(--text-mute); font-style: italic; margin-top: 6px; border-left: 2px solid var(--border); padding-left: 9px; }
+
+.note-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: var(--text-dim); margin-bottom: 14px; }
+.note-box b { color: var(--info); }
+
+/* ---- Módulo SOFA (pronóstico, fuera de 1ª hora) ---- */
+.sofa { margin-top: 12px; border: 1px solid var(--info-border); border-radius: 10px; overflow: hidden; }
+.sofa-head { background: var(--info-bg); padding: 9px 12px; font-size: 11.5px; color: var(--text-dim); line-height: 1.45; border-bottom: 1px solid var(--border-soft); }
+.sofa-head b { color: var(--info); }
+.sofa-row { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--border-soft); }
+.sofa-row .sys { flex: 1; font-size: 12.5px; color: var(--text-dim); }
+.sofa-row .sys small { color: var(--text-mute); }
+.sofa-row input, .sofa-row select { width: 104px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-elev2); color: var(--text); font-size: 12.5px; font-family: inherit; }
+.sofa-row .sc { width: 22px; text-align: center; font-family: ui-monospace, Menlo, monospace; font-weight: 700; font-size: 13px; color: var(--text-mute); flex: none; }
+.sofa-sup { display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 11.5px; color: var(--text-mute); border-bottom: 1px solid var(--border-soft); }
+.sofa-sup input { width: 15px; height: 15px; accent-color: var(--tD); }
+.sofa-tot { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 12px; background: var(--bg-elev2); }
+.sofa-tot .n { font-size: 22px; font-weight: 700; font-family: ui-monospace, Menlo, monospace; }
+.sofa-tot small { color: var(--text-mute); font-size: 11px; }
+
+/* ---- Espacio para el protocolo local del servicio (co-autoría) ---- */
+.slot { margin-top: 8px; border: 1px dashed var(--attention-border); background: var(--attention-bg); border-radius: 8px; padding: 9px 12px; font-size: 12px; color: var(--text-dim); line-height: 1.45; }
+.slot b { color: var(--attention); }
+
+.foot { grid-column: 1 / -1; text-align: center; color: var(--text-mute); font-size: 11px; padding: 18px 0 6px; font-family: ui-monospace, Menlo, monospace; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div>
+      <div class="logo">ETHOS · <span>Sepsis</span></div>
+      <div class="subtitle">Tutor · adulto · reconocimiento + primera hora + hemodinamia</div>
+    </div>
+    <div class="badge-docente">Herramienta docente · el clínico decide</div>
+  </div>
+
+  <!-- ============ COLUMNA IZQUIERDA: TABLERO PRIMERA HORA ============ -->
+  <div class="board">
+
+    <!-- NEWS2 -->
+    <div class="card">
+      <h3><span class="type-tag tag-D">D</span> NEWS2 · cribado</h3>
+      <div class="field">
+        <label>Frecuencia respiratoria (/min)</label>
+        <input type="number" id="n_rr" oninput="calcNews()" placeholder="—">
+      </div>
+      <div class="field">
+        <label>Escala SpO₂</label>
+        <span class="seg" id="n_scale">
+          <button class="on" data-s="1" onclick="setScale(1)">Escala 1</button>
+          <button data-s="2" onclick="setScale(2)">Escala 2 (hipercápnico)</button>
+        </span>
+      </div>
+      <div class="field">
+        <label>SpO₂ (%)</label>
+        <input type="number" id="n_spo2" oninput="calcNews()" placeholder="—">
+      </div>
+      <div class="field">
+        <label>¿Recibe O₂ suplementario?</label>
+        <select id="n_o2" onchange="calcNews()">
+          <option value="air">Aire ambiente</option>
+          <option value="o2">Sí, O₂</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>PA sistólica (mmHg)</label>
+        <input type="number" id="n_sbp" oninput="calcNews()" placeholder="—">
+      </div>
+      <div class="field">
+        <label>Frecuencia cardíaca (/min)</label>
+        <input type="number" id="n_hr" oninput="calcNews()" placeholder="—">
+      </div>
+      <div class="field">
+        <label>Temperatura (°C)</label>
+        <input type="number" step="0.1" id="n_temp" oninput="calcNews()" placeholder="—">
+      </div>
+      <div class="field">
+        <label>Conciencia</label>
+        <select id="n_avpu" onchange="calcNews()">
+          <option value="A">Alerta</option>
+          <option value="CVPU">Confusión nueva / V / P / U</option>
+        </select>
+      </div>
+      <div class="score-line">
+        <span><span class="score-num" id="n_score">—</span> <span style="font-size:12px;color:var(--text-mute)">/ 20</span></span>
+        <span class="score-flag flag-ok" id="n_flag">Sin datos</span>
+      </div>
+      <div class="mini-note" id="n_msg"></div>
+      <div class="receipt">
+        <b>NEWS2</b> · Royal College of Physicians 2017. Umbral clave <b>≥5</b> = revisión clínica urgente; <b>≥7</b> = respuesta de emergencia; cualquier parámetro individual = 3 también gatilla. SSC recomienda NEWS/NEWS2/SIRS <b>sobre</b> qSOFA como cribado
+        (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC 2026 #4, fuerte</a>).
+      </div>
+    </div>
+
+    <!-- qSOFA -->
+    <div class="card">
+      <h3><span class="type-tag tag-D">D</span> qSOFA · solo para enseñar el cambio</h3>
+      <div class="field check"><input type="checkbox" id="q_rr" onchange="calcQsofa()"><label>FR ≥ 22 /min</label></div>
+      <div class="field check"><input type="checkbox" id="q_gcs" onchange="calcQsofa()"><label>Alteración mental (GCS ≤ 14)</label></div>
+      <div class="field check"><input type="checkbox" id="q_sbp" onchange="calcQsofa()"><label>PA sistólica ≤ 100 mmHg</label></div>
+      <div class="score-line">
+        <span><span class="score-num" id="q_score">0</span> <span style="font-size:12px;color:var(--text-mute)">/ 3</span></span>
+        <span class="score-flag flag-ok" id="q_flag">—</span>
+      </div>
+      <div class="receipt">
+        <b>Sepsis-3</b> (<a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Singer 2016</a>). qSOFA <b>NO</b> es la herramienta de cribado recomendada por la SSC 2026; se calcula aquí solo para enseñar por qué se abandonó frente a NEWS2/SIRS.
+      </div>
+    </div>
+
+    <!-- Gatillos duros -->
+    <div class="card">
+      <h3><span class="type-tag tag-D">D</span> Gatillos duros</h3>
+      <div class="field">
+        <label>Edad (años) → meta PAM</label>
+        <input type="number" id="g_edad" oninput="calcPam()" placeholder="—">
+      </div>
+      <div class="score-line" style="margin-top:6px;border-top:none;padding-top:0">
+        <span style="font-size:13px;color:var(--text-dim)">Meta PAM</span>
+        <span class="score-flag flag-ok" id="g_pam">≥ 65 mmHg</span>
+      </div>
+      <div class="receipt"><b>PAM</b> ≥65 (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #13, fuerte</a>); 60–65 aceptable si ≥65 años (#14, condicional). El sistema fija la <b>meta</b>; la titulación del vasopresor es juicio clínico.</div>
+      <div class="field" style="margin-top:12px">
+        <label>Glicemia (mg/dL)</label>
+        <input type="number" id="g_glu" oninput="calcGlu()" placeholder="—">
+      </div>
+      <div class="score-line" style="margin-top:6px;border-top:none;padding-top:0">
+        <span style="font-size:13px;color:var(--text-dim)">Insulina</span>
+        <span class="score-flag flag-ok" id="g_glu_flag">—</span>
+      </div>
+      <div class="receipt"><b>Iniciar insulina a glicemia ≥180 mg/dL</b> (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #92, fuerte</a>). El sistema gatilla el umbral; <b>dosis/titulación de insulina = abstención</b> (juicio clínico).</div>
+    </div>
+
+    <!-- Checklist de proceso -->
+    <div class="card">
+      <h3><span class="type-tag tag-D">D</span> Gatillos de proceso</h3>
+      <div class="field check"><input type="checkbox" id="p_hemo"><label>Hemocultivos tomados <b>antes</b> del antibiótico</label></div>
+      <div class="field check"><input type="checkbox" id="p_lac"><label>Lactato medido (y seriado)</label></div>
+      <div class="receipt">Hemocultivo antes del ATB, idealmente (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #7, fuerte</a>) · medir lactato (#8, condicional). <b>No existe un umbral de "% de aclaramiento" de guía</b> — se usa lactato seriado como tendencia, no un corte numérico.</div>
+    </div>
+
+  </div>
+
+  <!-- ============ COLUMNA DERECHA: CONTENIDO ============ -->
+  <div>
+    <div class="main-tabs">
+      <button class="main-tab active" onclick="showTab('primera',this)">Primera hora</button>
+      <button class="main-tab" onclick="showTab('aprender',this)">Aprender</button>
+      <button class="main-tab" onclick="showTab('deriv',this)">Derivaciones</button>
+      <button class="main-tab" onclick="showTab('ref',this)">Referencias</button>
+    </div>
+
+    <!-- ===== PRIMERA HORA ===== -->
+    <div class="tab-panel active" id="tab-primera">
+      <div class="note-box">
+        <b>Cómo leer esto.</b> La cadena de 6 eslabones del GT-LATINFURG 2026. Cada decisión lleva su tipo — <span class="type-tag tag-D">D</span> el núcleo calcula/gatilla · <span class="type-tag tag-T">T</span> el tutor enseña · <span class="type-tag tag-A">A</span> el sistema se abstiene y deriva — y su <b>recibo</b> (rec.# + fuerza + cita). Regla rectora: <b>D calcula y gatilla; A ordena y titula.</b>
+      </div>
+
+      <!-- Eslabón 1 -->
+      <div class="eslabon">
+        <div class="eslabon-head"><div class="eslabon-num">1</div><h2>Sospechar y detectar</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Cribado NEWS2 / SIRS sobre qSOFA</div>
+          <div class="decision-note">Usa el tablero de la izquierda. NEWS2 ≥5 dispara revisión urgente.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #4 (fuerte)</a>: <i>"we recommend using NEWS, NEWS2, MEWS, or SIRS over qSOFA as a single tool to screen for sepsis."</i></div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Gatillo de cribado en urgencias</div>
+          <div class="decision-note">Desde el triaje, activa el reconocimiento si <b>qSOFA ≥2 · O · SIRS ≥2 · O · NEWS-2 ≥5</b> (o 3 puntos en una sola variable). No uses qSOFA como única herramienta en &lt;65 años.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.55633/s3me/005.2026" target="_blank">GT-LATINFURG 2026, PICO 1</a> (Emergencias 2026;38:27–63; consenso de urgencias con co-autor chileno del HUAP).</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Calcular qSOFA / SOFA</div>
+          <div class="decision-note">qSOFA se calcula solo para enseñar el cambio, no como cribado. SOFA pronóstico es módulo aparte (eslabón 6), nunca gatillo.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a>: SOFA ≥2; qSOFA = FR≥22 / GCS≤14 / PAS≤100.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span><span class="type-tag tag-A">A</span> ¿Este paciente TIENE sepsis?</div>
+          <div class="decision-note">El sistema enseña a interpretar los scores pero <b>se abstiene del label diagnóstico</b>. La sepsis es diagnóstico clínico.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #5 (GPS)</a>: <i>"Sepsis is a clinical diagnosis and should not be ruled in or ruled out using a single biomarker or diagnostic test."</i></div>
+        </div>
+      </div>
+
+      <!-- Eslabón 2 -->
+      <div class="eslabon">
+        <div class="eslabon-head"><div class="eslabon-num">2</div><h2>Activar</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span> Sugerir "código sepsis"</div>
+          <div class="decision-note">El código como intervención es condicional; el sistema deriva al <b>protocolo/código sepsis local de su servicio</b>.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #2 (condicional)</a> vs #1 (fuerte, programa de mejora).</div>
+          <div class="slot">◇ <b>Espacio para el protocolo/código sepsis de su servicio.</b> ETHOS enseña el principio; el disparador y la vía de activación los pone su equipo. Lo incorporamos juntos.</div>
+        </div>
+      </div>
+
+      <!-- Eslabón 3 -->
+      <div class="eslabon">
+        <div class="eslabon-head"><div class="eslabon-num">3</div><h2>Obtener</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Hemocultivos antes del antibiótico</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #7 (fuerte)</a>: <i>"…collecting blood cultures as soon as possible and ideally before the administration of antimicrobial therapy."</i></div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Medir lactato</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #8 (condicional)</a>: <i>"we suggest measuring blood lactate."</i></div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span><span class="type-tag tag-A">A</span> Procalcitonina para iniciar ATB</div>
+          <div class="decision-note">Evaluación clínica <b>sobre</b> procalcitonina para decidir si iniciar antibiótico.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #22</a>: <i>"clinical evaluation alone over procalcitonin… to decide whether to start."</i></div>
+        </div>
+      </div>
+
+      <!-- Eslabón 4 -->
+      <div class="eslabon">
+        <div class="eslabon-head"><div class="eslabon-num">4</div><h2>Administrar</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Tabla de <i>timing</i> del antibiótico</div>
+          <div class="decision-note">El sistema muestra la estratificación, <b>no</b> un veredicto ni un reloj por paciente. La categoría (¿shock? ¿probable?) la aporta el clínico.</div>
+          <table class="timing-table">
+            <tr><th>Escenario</th><th>Ventana</th><th>Fuerza</th></tr>
+            <tr><td class="strong">Shock séptico</td><td>&lt; 1 hora</td><td>#16 · fuerte</td></tr>
+            <tr><td class="strong">Sepsis (sin shock), probable</td><td>&lt; 1 hora</td><td>#17 · fuerte</td></tr>
+            <tr><td>Infección posible sin shock</td><td>&lt; 3 horas</td><td>#18 · condicional</td></tr>
+            <tr><td>Baja probabilidad de infección</td><td>Diferir / reevaluar</td><td>#20 · condicional</td></tr>
+          </table>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #16–#20</a>. La estratificación de 2026 reemplaza el "1 hora para todos". En urgencias, el <a class="cite" href="https://doi.org/10.55633/s3me/005.2026" target="_blank">GT-LATINFURG</a> cuenta la ventana <b>desde el triaje</b> (Tabla 10).</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-A">A</span> Elección de molécula / dosis del ATB</div>
+          <div class="decision-note">El sistema se abstiene y deriva al <b>antibiograma y protocolo local de su servicio</b>. Enseña el principio: amplio espectro precoz, cobertura MDR solo si hay factores, desescalar.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #25/#31</a> (remiten a patrones locales) · #36 (fuerte, desescalar).</div>
+          <div class="slot">◇ <b>Espacio para el antibiograma y esquema empírico de su servicio.</b> La guía manda derivar a los patrones locales — aquí es donde las moléculas y dosis de ustedes hacen la app suya. Lo incorporamos juntos.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span> Volumen inicial ~30 mL/kg cristaloide</div>
+          <div class="decision-note">Titular <b>docente</b>, nunca orden: reevaluación dinámica y poblaciones de riesgo primero. El número solo como calculadora opt-in subordinada.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #10 (condicional)</a>: <i>"at least 30 ml/kg… in the first 3 hours"</i> · #44 (balanceados sobre salino).</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> Meta de PAM</div>
+          <div class="decision-note">Umbral duro en el tablero: ≥65 (60–65 si ≥65 años).</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #13 (fuerte) / #14 (condicional)</a>.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span><span class="type-tag tag-T">T</span> Vasopresor de 1ª línea y secuencia</div>
+          <div class="decision-note">Noradrenalina 1ª línea → vasopresina → adrenalina; periférico aceptable al inicio. <b>Dosis/titulación = abstención.</b></div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #53 (fuerte) / #56 / #57 / #12</a>.</div>
+        </div>
+      </div>
+
+      <!-- Eslabón 5 -->
+      <div class="eslabon">
+        <div class="eslabon-head"><div class="eslabon-num">5</div><h2>Controlar</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span> Control de foco precoz</div>
+          <div class="decision-note">Timing <b>blando</b> (plazo óptimo incierto): idealmente &lt;6 h. Identificar e intervenir el foco es juicio clínico/quirúrgico.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #24 (condicional)</a>: <i>"early source control… ideally within 6 hours."</i></div>
+        </div>
+      </div>
+
+      <!-- Eslabón 6 -->
+      <div class="eslabon">
+        <div class="eslabon-head"><div class="eslabon-num">6</div><h2>Evaluar y trasladar</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span> SOFA pronóstico</div>
+          <div class="decision-note"><b>Fuera del flujo de la primera hora</b> — cuantifica/pronostica, <b>NUNCA gatilla</b>. Su ausencia <b>no debe paralizar</b>: se actúa por sospecha + bedside. Llena solo lo que tengas.</div>
+
+          <div class="sofa">
+            <div class="sofa-head">
+              <b>SOFA</b> · disfunción orgánica por sistema (0–4 c/u; total 0–24). <b>Sepsis-3:</b> un aumento agudo <b>≥2</b> sobre el basal (asume 0 si se desconoce) marca disfunción orgánica. Esto <b>no es un gatillo de acción</b>.
+            </div>
+            <div class="sofa-row">
+              <span class="sys">Respiración <small>· PaO₂/FiO₂ (mmHg)</small></span>
+              <input type="number" id="sf_pf" min="0" max="600" oninput="calcSofa()" placeholder="—">
+              <span class="sc" id="sc_resp">–</span>
+            </div>
+            <div class="sofa-sup"><input type="checkbox" id="sf_sup" onchange="calcSofa()"><label for="sf_sup">Con soporte respiratorio (VM) — necesario para puntajes 3–4</label></div>
+            <div class="sofa-row">
+              <span class="sys">Coagulación <small>· plaquetas ×10³/µL</small></span>
+              <input type="number" id="sf_plt" min="0" max="1000" oninput="calcSofa()" placeholder="—">
+              <span class="sc" id="sc_coag">–</span>
+            </div>
+            <div class="sofa-row">
+              <span class="sys">Hígado <small>· bilirrubina mg/dL</small></span>
+              <input type="number" step="0.1" id="sf_bili" min="0" max="60" oninput="calcSofa()" placeholder="—">
+              <span class="sc" id="sc_liver">–</span>
+            </div>
+            <div class="sofa-row">
+              <span class="sys">Cardiovascular <small>· PAM / vasopresor</small></span>
+              <input type="number" id="sf_map" min="0" max="250" oninput="calcSofa()" placeholder="PAM">
+              <span class="sc" id="sc_cv">–</span>
+            </div>
+            <div class="sofa-row" style="padding-top:0">
+              <span class="sys"><small>vasopresor (µg/kg/min, ≥1 h) — manda sobre la PAM</small></span>
+              <select id="sf_vaso" onchange="calcSofa()">
+                <option value="none">Ninguno</option>
+                <option value="d2">Dopa ≤5 o dobutamina</option>
+                <option value="d3">Dopa >5 · o adr ≤0,1 · o NA ≤0,1</option>
+                <option value="d4">Dopa >15 · o adr >0,1 · o NA >0,1</option>
+              </select>
+              <span class="sc"></span>
+            </div>
+            <div class="sofa-row">
+              <span class="sys">SNC <small>· Glasgow (3–15)</small></span>
+              <input type="number" id="sf_gcs" min="3" max="15" oninput="calcSofa()" placeholder="—">
+              <span class="sc" id="sc_cns">–</span>
+            </div>
+            <div class="sofa-row">
+              <span class="sys">Renal <small>· creatinina mg/dL</small></span>
+              <input type="number" step="0.1" id="sf_cr" min="0" max="20" oninput="calcSofa()" placeholder="—">
+              <span class="sc" id="sc_renal">–</span>
+            </div>
+            <div class="sofa-tot">
+              <span><span class="score-num sofa n" id="sf_total">–</span> <small>/ 24 · <span id="sf_ncount">0</span>/6 sistemas</small></span>
+              <span class="score-flag flag-ok" id="sf_flag" style="font-size:11.5px">Sin datos</span>
+            </div>
+          </div>
+
+          <div class="receipt">Tabla SOFA original: <a class="cite" href="https://doi.org/10.1007/BF01709751" target="_blank">Vincent 1996</a> (verificada en la reproducción de acceso abierto <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6880479/" target="_blank">Lambden 2019</a>). Concepto ΔSOFA ≥2: <a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a> · GT-LATINFURG Tabla 1. Renal también admite diuresis (&lt;500 mL/d = 3; &lt;200 mL/d = 4).</div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span><span class="type-tag tag-A">A</span> Traslado precoz a UCI</div>
+          <div class="decision-note">Destino = juicio + recursos locales.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #15 (condicional)</a>: <i>"admitting the patients to the ICU within 6 hours."</i></div>
+        </div>
+      </div>
+
+      <!-- Contrapesos -->
+      <div class="eslabon" style="border-color:var(--plan-border)">
+        <div class="eslabon-head"><div class="eslabon-num" style="background:var(--plan)">⚖</div><h2>Contrapesos de seguridad</h2></div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-D">D</span><span class="type-tag tag-T">T</span><span class="type-tag tag-A">A</span> De-resucitación (retirada activa de fluidos)</div>
+          <div class="decision-note">El contrapeso directo de la fila de fluidos: tras la fase aguda, el giro de "llenar" a "retirar". <b>D</b> calcula balance · <b>T</b> enseña el giro · <b>A</b> sobre el acto (cuánto diurético, cuándo ultrafiltrar).</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #89 (condicional, certeza muy baja)</a>: <i>"after the acute resuscitation phase, we suggest using active fluid removal."</i></div>
+        </div>
+        <div class="decision">
+          <div class="decision-title"><span class="type-tag tag-T">T</span><span class="type-tag tag-A">A</span> Corticoides en shock</div>
+          <div class="decision-note">Principio e indicación (shock con vasopresores); dosis/esquema fuera del statement → abstención.</div>
+          <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #79 (condicional)</a>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== APRENDER ===== -->
+    <div class="tab-panel" id="tab-aprender">
+      <div class="note-box"><b>Por qué este tutor es chico en el núcleo.</b> La sepsis casi no tiene números duros: casi todo es un gatillo condicional que presupone juicio clínico. Por eso el núcleo determinista es solo scores + gatillos de proceso + meta PAM + gatillo glicemia. Todo lo demás se enseña o se deriva.</div>
+
+      <div class="contro"><h3>1 · qSOFA salió como cribado</h3><p>La SSC 2026 recomienda NEWS/NEWS2/SIRS <b>sobre</b> qSOFA para cribar (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#4</a>). qSOFA sigue útil para enseñar, pero ya no es la puerta de entrada.</p></div>
+      <div class="contro"><h3>2 · Timing del antibiótico estratificado</h3><p>No "1 hora para todos": la guía 2026 estratifica por certeza y gravedad (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#16–#20</a>). Shock &lt;1h; posible sin shock hasta 3h; baja probabilidad, diferir.</p></div>
+      <div class="contro"><h3>3 · 30 mL/kg es condicional</h3><p>Señal de daño con resucitación liberal en entornos de bajos recursos, y aparición de la <b>de-resucitación</b> (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#89</a>): la guía se aleja del volumen fijo liberal. Por eso el 30 mL/kg no es orden.</p></div>
+      <div class="contro"><h3>4 · Código sepsis: condicional vs programa de mejora</h3><p>El "código sepsis" como intervención es condicional (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#2</a>), pero el programa de mejora de calidad es recomendación fuerte (#1). Lo primero deriva al protocolo local.</p></div>
+      <div class="contro"><h3>5 · El contexto chileno: qSOFA fuera del cribado</h3><p>Afuera <b>y</b> en Chile el cribado se aleja de qSOFA. La <b>SSC 2026</b> recomienda NEWS2/SIRS sobre qSOFA (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">#4</a>). Y la <b>SOCHIMI</b>, en declaración de su Directorio, <b>disiente de Sepsis-3</b> —lo juzga potencialmente riesgoso para países en desarrollo, donde el problema es la baja <i>sensibilidad</i> para detectar al séptico, no la especificidad— y conserva <b>SIRS</b> para el cribado (<a class="cite" href="https://medicina-intensiva.cl/post.php?id=1000140" target="_blank">Declaración SOCHIMI</a>). Incluso lineamientos MINSAL recientes siguen operando con SIRS. Por eso esta app criba con <b>NEWS2/SIRS, no con qSOFA</b>: es lo alineado con la realidad chilena, no una preferencia de diseño.</p></div>
+    </div>
+
+    <!-- ===== DERIVACIONES ===== -->
+    <div class="tab-panel" id="tab-deriv">
+      <div class="prohib">
+        <h2>Prohibiciones duras — el sistema NUNCA las emite</h2>
+        <ol>
+          <li>Countdown de antibiótico por paciente. <span style="color:var(--text-mute)">(Se muestra la tabla estratificada, nunca un reloj para ESTE paciente.)</span></li>
+          <li>Volumen de fluidos como número-titular u orden. <span style="color:var(--text-mute)">(30 mL/kg solo como calculadora opt-in subordinada.)</span></li>
+          <li>Dosis o titulación de cualquier fármaco (ATB, vasopresor, insulina, diurético).</li>
+          <li>Estampar el label diagnóstico "es sepsis".</li>
+        </ol>
+      </div>
+
+      <div class="note-box"><b>Fuera del dominio de diseño (ODD).</b> El sistema no infiere, no calcula y no enseña como propio nada de lo siguiente: lo reconoce y <b>deriva</b>.</div>
+
+      <div class="derivcard"><div class="out">Paciente pediátrico</div><div class="to">→ <b>Especialista / herramienta pediátrica de la suite.</b> Este tutor es solo del adulto.</div></div>
+      <div class="derivcard"><div class="out">Paciente embarazada</div><div class="to">→ <b>Especialista / obstetricia.</b></div></div>
+      <div class="derivcard"><div class="out">Foco que requiere especialista (control quirúrgico)</div><div class="to">→ <b>Juicio clínico/quirúrgico.</b></div></div>
+      <div class="derivcard"><div class="out">Diagnóstico "¿es sepsis?" (estampar el label)</div><div class="to">→ <b>Diagnóstico clínico del médico</b> (SSC #5).</div></div>
+      <div class="derivcard"><div class="out">Categoría de gravedad (¿shock? ¿probable?)</div><div class="to">→ <b>Input humano</b>; el sistema no infiere la categoría.</div></div>
+      <div class="derivcard"><div class="out">Elección de molécula / dosis de antibiótico</div><div class="to">→ <b>Antibiograma y protocolo local de su servicio</b> (SSC #25/#31).</div></div>
+      <div class="derivcard"><div class="out">Dosis / titulación de cualquier fármaco</div><div class="to">→ <b>Juicio clínico del médico</b>.</div></div>
+      <div class="derivcard"><div class="out">Destino (admisión a UCI)</div><div class="to">→ <b>Juicio + recursos locales</b> (SSC #15).</div></div>
+    </div>
+
+    <!-- ===== REFERENCIAS ===== -->
+    <div class="tab-panel" id="tab-ref">
+      <div class="note-box"><b>Regla de integridad.</b> Toda ancla lleva su recibo (rec.# + fuerza + cita textual), verificado en fuente primaria. Un número sin recibo es tan atacable como uno inventado.</div>
+
+      <div class="refblock">
+        <h3>SSC 2026 — corazón de las decisiones</h3>
+        <div class="meta">Prescott HC, Antonelli M, Alhazzani W, et al. <i>Surviving Sepsis Campaign… 2026.</i> Crit Care Med 2026;54(4):725–812. <a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">DOI 10.1097/CCM.0000000000007075</a> · PMID 41869847</div>
+        <div class="quote">Verificado: Table of Statements (recs 1–129; 46 nuevas), págs. 725–734. Última versión oficial vigente (reemplaza SSC 2021 de Evans et al.).</div>
+      </div>
+      <div class="refblock">
+        <h3>Sepsis-3 — definición y qSOFA</h3>
+        <div class="meta">Singer M, et al. JAMA 2016;315(8):801–810. <a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">DOI 10.1001/jama.2016.0287</a></div>
+        <div class="quote">Verificado: definiciones + qSOFA (FR≥22 / GCS≤14 / PAS≤100), SOFA ≥2.</div>
+      </div>
+      <div class="refblock">
+        <h3>SOFA — tabla de disfunción orgánica</h3>
+        <div class="meta">Vincent JL, et al. <i>The SOFA score to describe organ dysfunction/failure.</i> Intensive Care Med 1996;22(7):707–710. <a class="cite" href="https://doi.org/10.1007/BF01709751" target="_blank">DOI 10.1007/BF01709751</a> · PMID 8844239</div>
+        <div class="quote">Cortes 0–4 de los 6 sistemas verificados contra la reproducción de acceso abierto: <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6880479/" target="_blank">Lambden 2019, Crit Care 23:374 (Tabla 1)</a>. Dato: "SOFA" fue originalmente <i>Sepsis-related</i> Organ Failure Assessment; se renombró <i>Sequential</i> al validarse en no sépticos.</div>
+      </div>
+      <div class="refblock">
+        <h3>GT-LATINFURG 2026 — cadena de 6 eslabones (regional / LATAM)</h3>
+        <div class="meta">Julián-Jiménez A, et al. Emergencias 2026;38(1):27–63. <a class="cite" href="https://doi.org/10.55633/s3me/005.2026" target="_blank">DOI 10.55633/s3me/005.2026</a></div>
+        <div class="quote">Verificado: cadena de 6 eslabones + gatillo de cribado (PICO 1) + timing estratificado desde triaje (Tabla 10, PICO 9). Estructura el flujo de esta app.</div>
+      </div>
+      <div class="refblock">
+        <h3>SOCHIMI 2017 — respaldo chileno (contexto nacional)</h3>
+        <div class="meta">Romero C, Luengo C, Regueira T, Castro R, Hernández G, et al. <i>Recomendaciones SOCHIMI para el Manejo Inicial de la Sepsis.</i> Rev Chil Med Intensiva 2017;32(2):107–126. <a class="cite" href="https://medicina-intensiva.cl/post.php?id=1000222" target="_blank">Sociedad Chilena de Medicina Intensiva</a></div>
+        <div class="quote">Respalda el contenido de la app (antibiótico &lt;1 h; ≥30 mL/kg si hipotensión o lactato &gt;2; PAM 65–70; noradrenalina 1ª línea; sin almidones). Matiz chileno: SIRS-céntrico y disiente de Sepsis-3 (ver Aprender §5). Documento de sociedad científica; no hay guía MINSAL/GES nacional de sepsis del adulto.</div>
+      </div>
+      <div class="refblock">
+        <h3>NEWS2 — score de cribado</h3>
+        <div class="meta">Royal College of Physicians. <i>National Early Warning Score (NEWS) 2.</i> Updated report of a working party. London: RCP, 2017. <a class="cite" href="https://www.rcp.ac.uk/media/a4ibkkbf/news2-final-report_0_0.pdf" target="_blank">Informe oficial (PDF)</a></div>
+        <div class="quote">Tabla de 7 parámetros verificada en el informe oficial. Escala 2 (SpO₂ objetivo 88–92%) para fallo respiratorio hipercápnico (EPOC).</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">ETHOS · Sepsis v1.0 — tutor docente estático · anclado en codebook v2 (congelado) · núcleo y tabla SOFA verificados en fuente primaria · el clínico decide</div>
+
+</div>
+
+<script>
+/* ---------- NEWS2 ---------- */
+var newsScale = 1;
+function setScale(s){
+  newsScale = s;
+  document.querySelectorAll('#n_scale button').forEach(function(b){ b.classList.toggle('on', +b.dataset.s === s); });
+  calcNews();
+}
+function rangeScore(v, bands){ // bands: [[max,score],...] ascending by max; last is Infinity
+  for (var i=0;i<bands.length;i++){ if (v <= bands[i][0]) return bands[i][1]; }
+  return bands[bands.length-1][1];
+}
+function scoreRR(v){ return rangeScore(v, [[8,3],[11,1],[20,0],[24,2],[Infinity,3]]); }
+function scoreSBP(v){ return rangeScore(v, [[90,3],[100,2],[110,1],[219,0],[Infinity,3]]); }
+function scoreHR(v){ return rangeScore(v, [[40,3],[50,1],[90,0],[110,1],[130,2],[Infinity,3]]); }
+function scoreTemp(v){ return rangeScore(v, [[35.0,3],[36.0,1],[38.0,0],[39.0,1],[Infinity,2]]); }
+function scoreSpO2Scale1(v){ return rangeScore(v, [[91,3],[93,2],[95,1],[Infinity,0]]); }
+function scoreSpO2Scale2(v, onO2){
+  if (v <= 83) return 3;
+  if (v <= 85) return 2;
+  if (v <= 87) return 1;
+  if (v <= 92) return 0;            // 88-92: 0 en ambos casos
+  // v >= 93
+  if (!onO2) return 0;              // 93+ en aire = 0 (objetivo alcanzado en air)
+  if (v <= 94) return 1;
+  if (v <= 96) return 2;
+  return 3;                          // >=97 con O2
+}
+function calcNews(){
+  var parts = [];
+  var anyThree = false, total = 0, hasData = false;
+  function add(id, fn){
+    var raw = document.getElementById(id).value;
+    if (raw === '' || raw === null) return;
+    hasData = true;
+    var s = fn(parseFloat(raw));
+    total += s; if (s === 3) anyThree = true;
+  }
+  add('n_rr', scoreRR);
+  var spo2raw = document.getElementById('n_spo2').value;
+  var onO2 = document.getElementById('n_o2').value === 'o2';
+  if (spo2raw !== ''){
+    hasData = true;
+    var ss = newsScale === 1 ? scoreSpO2Scale1(parseFloat(spo2raw)) : scoreSpO2Scale2(parseFloat(spo2raw), onO2);
+    total += ss; if (ss === 3) anyThree = true;
+  }
+  if (onO2){ total += 2; hasData = true; } // aire/oxígeno: +2 si O2
+  add('n_sbp', scoreSBP);
+  add('n_hr', scoreHR);
+  add('n_temp', scoreTemp);
+  if (document.getElementById('n_avpu').value === 'CVPU'){ total += 3; anyThree = true; hasData = true; }
+
+  var elN = document.getElementById('n_score'), elF = document.getElementById('n_flag'), elM = document.getElementById('n_msg');
+  if (!hasData){ elN.textContent = '—'; elF.className='score-flag flag-ok'; elF.textContent='Sin datos'; elM.textContent=''; return; }
+  elN.textContent = total;
+  elF.className = 'score-flag';
+  if (total >= 7){ elF.classList.add('flag-crit'); elF.textContent = 'Respuesta de emergencia'; elM.textContent = 'NEWS2 ≥7: respuesta clínica de emergencia (RCP 2017).'; }
+  else if (total >= 5 || anyThree){ elF.classList.add('flag-warn'); elF.textContent = 'Revisión urgente'; elM.textContent = (total<5 && anyThree) ? 'Un parámetro individual = 3: gatilla revisión aunque el total sea <5.' : 'NEWS2 ≥5: revisión clínica urgente.'; }
+  else { elF.classList.add('flag-ok'); elF.textContent = 'Bajo'; elM.textContent = 'Riesgo bajo por NEWS2; el juicio clínico manda.'; }
+}
+
+/* ---------- qSOFA ---------- */
+function calcQsofa(){
+  var n = 0;
+  ['q_rr','q_gcs','q_sbp'].forEach(function(id){ if (document.getElementById(id).checked) n++; });
+  document.getElementById('q_score').textContent = n;
+  var f = document.getElementById('q_flag');
+  f.className = 'score-flag';
+  if (n >= 2){ f.classList.add('flag-warn'); f.textContent = '≥2 (didáctico)'; }
+  else { f.classList.add('flag-ok'); f.textContent = '<2'; }
+}
+
+/* ---------- PAM ---------- */
+function calcPam(){
+  var e = document.getElementById('g_edad').value;
+  var f = document.getElementById('g_pam');
+  if (e === ''){ f.className='score-flag flag-ok'; f.textContent='≥ 65 mmHg'; return; }
+  if (parseFloat(e) >= 65){ f.className='score-flag flag-ok'; f.textContent='≥ 65 (o 60–65)'; }
+  else { f.className='score-flag flag-ok'; f.textContent='≥ 65 mmHg'; }
+}
+
+/* ---------- Glicemia ---------- */
+function calcGlu(){
+  var g = document.getElementById('g_glu').value;
+  var f = document.getElementById('g_glu_flag');
+  if (g === ''){ f.className='score-flag flag-ok'; f.textContent='—'; return; }
+  if (parseFloat(g) >= 180){ f.className='score-flag flag-crit'; f.textContent='Iniciar insulina (≥180)'; }
+  else { f.className='score-flag flag-ok'; f.textContent='Bajo umbral'; }
+}
+
+/* ---------- SOFA (pronóstico · fuera de 1ª hora · NUNCA gatillo) ---------- */
+/* Cortes verificados: Vincent 1996 (ICM 22:707-710) vía Lambden 2019 (PMC6880479). */
+function sfResp(pf, sup){ if(pf==='')return null; pf=parseFloat(pf); if(isNaN(pf))return null;
+  if(pf>=400)return 0; if(pf>=300)return 1; if(pf>=200)return 2; if(pf>=100)return sup?3:2; return sup?4:2; }
+function sfCoag(p){ if(p==='')return null; p=parseFloat(p); if(isNaN(p))return null;
+  if(p>=150)return 0; if(p>=100)return 1; if(p>=50)return 2; if(p>=20)return 3; return 4; }
+function sfLiver(b){ if(b==='')return null; b=parseFloat(b); if(isNaN(b))return null;
+  if(b<1.2)return 0; if(b<2.0)return 1; if(b<6.0)return 2; if(b<12.0)return 3; return 4; }
+function sfCv(map, vaso){ if(vaso==='d2')return 2; if(vaso==='d3')return 3; if(vaso==='d4')return 4;
+  if(map==='')return null; map=parseFloat(map); if(isNaN(map))return null; return map>=70?0:1; }
+function sfCns(g){ if(g==='')return null; g=parseFloat(g); if(isNaN(g))return null;
+  if(g>=15)return 0; if(g>=13)return 1; if(g>=10)return 2; if(g>=6)return 3; return 4; }
+function sfRenal(c){ if(c==='')return null; c=parseFloat(c); if(isNaN(c))return null;
+  if(c<1.2)return 0; if(c<2.0)return 1; if(c<3.5)return 2; if(c<5.0)return 3; return 4; }
+function calcSofa(){
+  var val = function(id){ return document.getElementById(id).value; };
+  var scores = {
+    sc_resp:  sfResp(val('sf_pf'), document.getElementById('sf_sup').checked),
+    sc_coag:  sfCoag(val('sf_plt')),
+    sc_liver: sfLiver(val('sf_bili')),
+    sc_cv:    sfCv(val('sf_map'), val('sf_vaso')),
+    sc_cns:   sfCns(val('sf_gcs')),
+    sc_renal: sfRenal(val('sf_cr'))
+  };
+  var total = 0, n = 0;
+  for (var k in scores){
+    var s = scores[k];
+    document.getElementById(k).textContent = (s === null) ? '–' : s;
+    document.getElementById(k).style.color = (s === null) ? 'var(--text-mute)'
+      : (s >= 3 ? 'var(--critical)' : (s >= 1 ? 'var(--attention)' : 'var(--ok)'));
+    if (s !== null){ total += s; n++; }
+  }
+  var t = document.getElementById('sf_total'), f = document.getElementById('sf_flag');
+  document.getElementById('sf_ncount').textContent = n;
+  if (n === 0){ t.textContent = '–'; f.className='score-flag flag-ok'; f.textContent='Sin datos'; return; }
+  t.textContent = total;
+  f.className = 'score-flag';
+  if (total >= 2){ f.classList.add('flag-warn'); f.textContent = (n<6 ? 'ΔSOFA ≥2 (parcial)' : 'ΔSOFA ≥2'); }
+  else { f.classList.add('flag-ok'); f.textContent = (n<6 ? 'Parcial' : 'Sin disfunción'); }
+}
+
+/* ---------- Tabs ---------- */
+function showTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.main-tab').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+}
+calcQsofa();
+calcSofa();
+</script>
+</body>
+</html>
