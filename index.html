@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETHOS · Sepsis — Tutor primera hora v1.0</title>
+<title>ETHOS · Sepsis — Tutor primera hora v1.1</title>
 <meta name="theme-color" content="#0e1014">
+<!-- Sin caché: una app clínica NUNCA debe servirse desde una copia vieja del navegador.
+     Una v1.0 en pantalla puntúa un GCS 20 como "normal" en verde. El usuario no tiene
+     forma de saber que está viendo una versión superada: se fuerza la revalidación. -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <!-- Open Graph / difusión (mantener sincronizado con el repo publicado) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://eddysalvador80.github.io/ethos-sepsis/">
@@ -312,6 +318,39 @@ body {
 
 .foot { grid-column: 1 / -1; text-align: center; color: var(--text-mute); font-size: 11px; padding: 18px 0 6px; font-family: ui-monospace, Menlo, monospace; }
 
+/* ---------- Validación de rango (anti-error de tecleo) ---------- */
+input.vr-bad { border-color: var(--critical) !important; background: var(--critical-bg) !important; }
+input.vr-warn { border-color: var(--attention) !important; background: var(--attention-bg) !important; }
+.vr-msg { font-size: 11.5px; margin: 3px 0 0; line-height: 1.4; }
+.vr-msg.bad { color: var(--critical); font-weight: 600; }
+.vr-msg.warn { color: var(--attention); }
+
+/* ---------- Hoja de acción AHORA ---------- */
+.act { border: 1px solid var(--critical-border); background: var(--bg-elev); border-radius: 10px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(207,58,57,.07); }
+.act.act-warn { border-color: var(--attention-border); box-shadow: 0 2px 10px rgba(185,118,12,.07); }
+.act-head { padding: 12px 16px; background: var(--critical-bg); border-bottom: 1px solid var(--critical-border); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.act.act-warn .act-head { background: var(--attention-bg); border-bottom-color: var(--attention-border); }
+.act-head h2 { font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--critical); font-family: ui-monospace, Menlo, monospace; }
+.act.act-warn .act-head h2 { color: var(--attention); }
+.act-sub { font-size: 12px; color: var(--text-dim); }
+.act-body { padding: 6px 16px 14px; }
+.act-step { display: flex; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--border-soft); }
+.act-step:last-child { border-bottom: none; }
+.act-n { flex: 0 0 22px; height: 22px; border-radius: 50%; background: var(--tD); color: #fff; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: ui-monospace, Menlo, monospace; margin-top: 1px; }
+.act-n.n-A { background: var(--tA); }
+.act-n.n-T { background: var(--tT); }
+.act-txt { flex: 1; min-width: 0; }
+.act-do { font-size: 14px; color: var(--text); font-weight: 600; line-height: 1.45; }
+.act-do .big { font-size: 17px; color: var(--critical); font-family: ui-monospace, Menlo, monospace; font-weight: 700; }
+.act-why { font-size: 12.5px; color: var(--text-dim); margin-top: 2px; line-height: 1.45; }
+.act-src { font-size: 11.5px; color: var(--text-mute); margin-top: 3px; }
+.act-src a { color: var(--tD); }
+.act-when { display: inline-block; font-size: 10.5px; font-family: ui-monospace, Menlo, monospace; padding: 1px 6px; border-radius: 4px; background: var(--bg-elev3); color: var(--text-dim); margin-left: 6px; vertical-align: middle; }
+.act-when.w-now { background: var(--critical-bg); color: var(--critical); border: 1px solid var(--critical-border); }
+.act-miss { margin: 10px 16px 14px; padding: 9px 11px; border-radius: 7px; background: var(--info-bg); border: 1px solid var(--info-border); font-size: 12.5px; color: var(--text-dim); }
+.act-foot { padding: 10px 16px; background: var(--bg-elev2); border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-mute); line-height: 1.5; }
+.act-idle { border: 1px dashed var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; color: var(--text-mute); background: var(--bg-elev); }
+
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; }
 }
@@ -338,6 +377,7 @@ body {
         <label>Frecuencia respiratoria (/min)</label>
         <input type="number" id="n_rr" oninput="calcNews()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_n_rr"></div>
       <div class="field">
         <label>Escala SpO₂</label>
         <span class="seg" id="n_scale">
@@ -350,6 +390,7 @@ body {
         <label>SpO₂ (%)</label>
         <input type="number" id="n_spo2" oninput="calcNews()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_n_spo2"></div>
       <div class="field">
         <label>¿Recibe O₂ suplementario?</label>
         <select id="n_o2" onchange="calcNews()">
@@ -361,14 +402,17 @@ body {
         <label>PA sistólica (mmHg)</label>
         <input type="number" id="n_sbp" oninput="calcNews()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_n_sbp"></div>
       <div class="field">
         <label>Frecuencia cardíaca (/min)</label>
         <input type="number" id="n_hr" oninput="calcNews()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_n_hr"></div>
       <div class="field">
         <label>Temperatura (°C)</label>
         <input type="number" step="0.1" id="n_temp" oninput="calcNews()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_n_temp"></div>
       <div class="field">
         <label>Conciencia</label>
         <select id="n_avpu" onchange="calcNews()">
@@ -390,15 +434,34 @@ body {
     <!-- qSOFA -->
     <div class="card">
       <h3><span class="type-tag tag-D">D</span> qSOFA · solo para enseñar el cambio</h3>
-      <div class="field check"><input type="checkbox" id="q_rr" onchange="calcQsofa()"><label>FR ≥ 22 /min</label></div>
-      <div class="field check"><input type="checkbox" id="q_gcs" onchange="calcQsofa()"><label>Alteración mental (GCS ≤ 14)</label></div>
-      <div class="field check"><input type="checkbox" id="q_sbp" onchange="calcQsofa()"><label>PA sistólica ≤ 100 mmHg</label></div>
+      <div class="field check"><input type="checkbox" id="q_rr" disabled><label>FR ≥ 22 /min</label></div>
+      <div class="field check"><input type="checkbox" id="q_gcs" disabled><label>Alteración mental (GCS ≤ 14 / no alerta)</label></div>
+      <div class="field check"><input type="checkbox" id="q_sbp" disabled><label>PA sistólica ≤ 100 mmHg</label></div>
       <div class="score-line">
-        <span><span class="score-num" id="q_score">0</span> <span style="font-size:12px;color:var(--text-mute)">/ 3</span></span>
-        <span class="score-flag flag-ok" id="q_flag">—</span>
+        <span><span class="score-num" id="q_score">—</span> <span style="font-size:12px;color:var(--text-mute)">/ 3</span></span>
+        <span class="score-flag flag-ok" id="q_flag">Sin datos</span>
+      </div>
+      <div class="mini-note" id="q_msg" style="margin-top:6px"></div>
+      <div class="receipt">
+        <b>Derivado del tablero</b> — se calcula con la FR, la PAS y la conciencia que ya tecleaste arriba; no se piden dos veces (teclear el mismo dato dos veces es una fuente de incoherencia, no una verificación). <b>Sepsis-3</b> (<a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Singer 2016</a>). qSOFA <b>NO</b> es la herramienta de cribado recomendada por la SSC 2026; se calcula aquí solo para enseñar por qué se abandonó frente a NEWS2/SIRS. <span style="color:var(--attention)">El mapeo conciencia→GCS≤14 usa el AVPU del tablero: "no alerta" implica GCS≤14, pero un GCS 13–14 puede verse "alerta"</span> — si sospechas deterioro sutil, manda el GCS real.
+      </div>
+    </div>
+
+    <!-- Escenario: input clínico -->
+    <div class="card">
+      <h3><span class="type-tag tag-A">A</span> Escenario · lo defines tú</h3>
+      <div class="field">
+        <label style="flex:0 0 auto">Categoría</label>
+        <select id="e_cat" onchange="buildAction()" style="flex:1">
+          <option value="">— elige —</option>
+          <option value="shock">Shock séptico</option>
+          <option value="probable">Sepsis probable, sin shock</option>
+          <option value="posible">Infección posible, sin shock</option>
+          <option value="baja">Baja probabilidad de infección</option>
+        </select>
       </div>
       <div class="receipt">
-        <b>Sepsis-3</b> (<a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Singer 2016</a>). qSOFA <b>NO</b> es la herramienta de cribado recomendada por la SSC 2026; se calcula aquí solo para enseñar por qué se abandonó frente a NEWS2/SIRS.
+        <b>El sistema no pone este label — lo pones tú.</b> La sepsis es diagnóstico clínico (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #5, GPS</a>) y de esta categoría depende la ventana del antibiótico (#16–#20). <b>Shock séptico</b> = hipotensión que requiere vasopresor para PAM ≥65 <b>+</b> lactato &gt;2 mmol/L pese a resucitación adecuada (<a class="cite" href="https://doi.org/10.1001/jama.2016.0287" target="_blank">Sepsis-3</a>).
       </div>
     </div>
 
@@ -407,17 +470,29 @@ body {
       <h3><span class="type-tag tag-D">D</span> Gatillos duros</h3>
       <div class="field">
         <label>Edad (años) → meta PAM</label>
-        <input type="number" id="g_edad" oninput="calcPam()" placeholder="—">
+        <input type="number" id="g_edad" oninput="calcPam();buildAction()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_g_edad"></div>
       <div class="score-line" style="margin-top:6px;border-top:none;padding-top:0">
         <span style="font-size:13px;color:var(--text-dim)">Meta PAM</span>
         <span class="score-flag flag-ok" id="g_pam">≥ 65 mmHg</span>
       </div>
       <div class="receipt"><b>PAM</b> ≥65 (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #13, fuerte</a>); 60–65 aceptable si ≥65 años (#14, condicional). El sistema fija la <b>meta</b>; la titulación del vasopresor es juicio clínico.</div>
       <div class="field" style="margin-top:12px">
-        <label>Glicemia (mg/dL)</label>
-        <input type="number" id="g_glu" oninput="calcGlu()" placeholder="—">
+        <label>Peso (kg) → volumen inicial</label>
+        <input type="number" step="0.5" id="g_peso" oninput="buildAction()" placeholder="—">
       </div>
+      <div class="vr-msg" id="vr_g_peso"></div>
+      <div class="score-line" style="margin-top:6px;border-top:none;padding-top:0">
+        <span style="font-size:13px;color:var(--text-dim)">30 mL/kg</span>
+        <span class="score-flag flag-ok" id="g_vol">—</span>
+      </div>
+      <div class="receipt"><b>Peso para calcular el volumen</b>, no para decidirlo. ~30 mL/kg de cristaloide en las primeras 3 h (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #10, condicional</a>) · balanceados sobre salino (#44). <b>La cifra es un punto de partida, no una orden</b>: reevaluación dinámica y poblaciones de riesgo (cardiópata, ERC, cirrosis) mandan.</div>
+      <div class="field" style="margin-top:12px">
+        <label>Glicemia (mg/dL)</label>
+        <input type="number" id="g_glu" oninput="calcGlu();buildAction()" placeholder="—">
+      </div>
+      <div class="vr-msg" id="vr_g_glu"></div>
       <div class="score-line" style="margin-top:6px;border-top:none;padding-top:0">
         <span style="font-size:13px;color:var(--text-dim)">Insulina</span>
         <span class="score-flag flag-ok" id="g_glu_flag">—</span>
@@ -428,8 +503,10 @@ body {
     <!-- Checklist de proceso -->
     <div class="card">
       <h3><span class="type-tag tag-D">D</span> Gatillos de proceso</h3>
-      <div class="field check"><input type="checkbox" id="p_hemo"><label>Hemocultivos tomados <b>antes</b> del antibiótico</label></div>
-      <div class="field check"><input type="checkbox" id="p_lac"><label>Lactato medido (y seriado)</label></div>
+      <div class="field check"><input type="checkbox" id="p_hemo" onchange="buildAction()"><label>Hemocultivos tomados <b>antes</b> del antibiótico</label></div>
+      <div class="field check"><input type="checkbox" id="p_lac" onchange="buildAction()"><label>Lactato medido (y seriado)</label></div>
+      <div class="field check"><input type="checkbox" id="p_atb" onchange="buildAction()"><label>Antibiótico administrado</label></div>
+      <div class="field check"><input type="checkbox" id="p_vol" onchange="buildAction()"><label>Volumen inicial iniciado</label></div>
       <div class="receipt">Hemocultivo antes del ATB, idealmente (<a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #7, fuerte</a>) · medir lactato (#8, condicional). <b>No existe un umbral de "% de aclaramiento" de guía</b> — se usa lactato seriado como tendencia, no un corte numérico.</div>
     </div>
 
@@ -448,6 +525,10 @@ body {
 
     <!-- ===== PRIMERA HORA ===== -->
     <div class="tab-panel active" id="tab-primera">
+
+      <!-- ===== HOJA DE ACCIÓN (se arma con los datos del tablero) ===== -->
+      <div id="action-sheet"></div>
+
       <div class="note-box">
         <b>Cómo leer esto.</b> La cadena de 6 eslabones del GT-LATINFURG 2026. Cada decisión lleva su tipo — <span class="type-tag tag-D">D</span> el núcleo calcula/gatilla · <span class="type-tag tag-T">T</span> el tutor enseña · <span class="type-tag tag-A">A</span> el sistema se abstiene y deriva — y su <b>recibo</b> (rec.# + fuerza + cita). Regla rectora: <b>D calcula y gatilla; A ordena y titula.</b>
       </div>
@@ -567,25 +648,29 @@ body {
             </div>
             <div class="sofa-row">
               <span class="sys">Respiración <small>· PaO₂/FiO₂ (mmHg)</small></span>
-              <input type="number" id="sf_pf" min="0" max="600" oninput="calcSofa()" placeholder="—">
+              <input type="number" id="sf_pf" min="10" max="700" oninput="calcSofa()" placeholder="—">
               <span class="sc" id="sc_resp">–</span>
             </div>
+            <div class="vr-msg" id="vr_sf_pf"></div>
             <div class="sofa-sup"><input type="checkbox" id="sf_sup" onchange="calcSofa()"><label for="sf_sup">Con soporte respiratorio (VM) — necesario para puntajes 3–4</label></div>
             <div class="sofa-row">
               <span class="sys">Coagulación <small>· plaquetas ×10³/µL</small></span>
-              <input type="number" id="sf_plt" min="0" max="1000" oninput="calcSofa()" placeholder="—">
+              <input type="number" id="sf_plt" min="0" max="3000" oninput="calcSofa()" placeholder="—">
               <span class="sc" id="sc_coag">–</span>
             </div>
+            <div class="vr-msg" id="vr_sf_plt"></div>
             <div class="sofa-row">
               <span class="sys">Hígado <small>· bilirrubina mg/dL</small></span>
               <input type="number" step="0.1" id="sf_bili" min="0" max="60" oninput="calcSofa()" placeholder="—">
               <span class="sc" id="sc_liver">–</span>
             </div>
+            <div class="vr-msg" id="vr_sf_bili"></div>
             <div class="sofa-row">
               <span class="sys">Cardiovascular <small>· PAM / vasopresor</small></span>
-              <input type="number" id="sf_map" min="0" max="250" oninput="calcSofa()" placeholder="PAM">
+              <input type="number" id="sf_map" min="10" max="250" oninput="calcSofa()" placeholder="PAM">
               <span class="sc" id="sc_cv">–</span>
             </div>
+            <div class="vr-msg" id="vr_sf_map"></div>
             <div class="sofa-row" style="padding-top:0">
               <span class="sys"><small>vasopresor (µg/kg/min, ≥1 h) — manda sobre la PAM</small></span>
               <select id="sf_vaso" onchange="calcSofa()">
@@ -601,11 +686,14 @@ body {
               <input type="number" id="sf_gcs" min="3" max="15" oninput="calcSofa()" placeholder="—">
               <span class="sc" id="sc_cns">–</span>
             </div>
+            <div class="vr-msg" id="vr_sf_gcs"></div>
             <div class="sofa-row">
               <span class="sys">Renal <small>· creatinina mg/dL</small></span>
-              <input type="number" step="0.1" id="sf_cr" min="0" max="20" oninput="calcSofa()" placeholder="—">
+              <input type="number" step="0.1" id="sf_cr" min="0.1" max="30" oninput="calcSofa()" placeholder="—">
               <span class="sc" id="sc_renal">–</span>
             </div>
+            <div class="vr-msg" id="vr_sf_cr"></div>
+            <div class="vr-msg" id="vr_sofa_cross"></div>
             <div class="sofa-tot">
               <span><span class="score-num sofa n" id="sf_total">–</span> <small>/ 24 · <span id="sf_ncount">0</span>/6 sistemas</small></span>
               <span class="score-flag flag-ok" id="sf_flag" style="font-size:11.5px">Sin datos</span>
@@ -909,7 +997,7 @@ body {
 
   </div>
 
-  <div class="foot">ETHOS · Sepsis v1.0 — tutor docente estático · anclado en codebook v2 (congelado) · núcleo y tabla SOFA verificados en fuente primaria · el clínico decide</div>
+  <div class="foot">ETHOS · Sepsis <b>v1.1</b> (16-jul-2026) — tutor docente estático · anclado en codebook v2 (congelado) · núcleo y tabla SOFA verificados en fuente primaria · <b>el clínico decide</b><br>Versión actual: <b>v1.1</b>. Si esta línea muestra una versión anterior, recarga la página para actualizar.</div>
 
   <!-- Modal de referencia (citas clicables) -->
   <div id="refModal" class="ref-modal" onclick="if(event.target===this)closeRefModal()">
@@ -929,6 +1017,62 @@ body {
 </div>
 
 <script>
+/* ---------- Validación de rango (anti-error de tecleo) ----------
+   lo/hi  = fisiológicamente imposible fuera de aquí  → se BLOQUEA (no entra al cálculo)
+   plo/phi= posible pero implausible                  → se AVISA (sí entra al cálculo)
+   Principio: bloquear lo imposible, avisar lo implausible. Nunca calcular sobre basura
+   en silencio: un score que suma con SpO₂ 150% es peor que un score que no suma. */
+var VR = {
+  n_rr:   {lo:3,  hi:80,   plo:6,  phi:60,  u:'/min',  name:'FR'},
+  n_spo2: {lo:30, hi:100,  plo:70, phi:100, u:'%',     name:'SpO₂'},
+  n_sbp:  {lo:30, hi:300,  plo:60, phi:250, u:'mmHg',  name:'PA sistólica'},
+  n_hr:   {lo:15, hi:300,  plo:30, phi:220, u:'/min',  name:'FC'},
+  n_temp: {lo:25, hi:45,   plo:32, phi:42,  u:'°C',    name:'Temperatura'},
+  g_edad: {lo:0,  hi:120,  plo:18, phi:105, u:'años',  name:'Edad'},
+  g_peso: {lo:25, hi:400,  plo:38, phi:250, u:'kg',    name:'Peso'},
+  g_glu:  {lo:5,  hi:2000, plo:25, phi:900, u:'mg/dL', name:'Glicemia'},
+  /* SOFA — sin esto, un GCS 20 mal tecleado puntuaba 0 y se leía "cerebro sano" (verde). */
+  sf_pf:  {lo:10, hi:700,  plo:40, phi:500, u:'mmHg',   name:'PaO₂/FiO₂'},
+  sf_plt: {lo:0,  hi:3000, plo:2,  phi:1000,u:'×10³/µL',name:'Plaquetas'},
+  sf_bili:{lo:0,  hi:60,   plo:0.1,phi:40,  u:'mg/dL',  name:'Bilirrubina'},
+  sf_map: {lo:10, hi:250,  plo:30, phi:150, u:'mmHg',   name:'PAM'},
+  sf_gcs: {lo:3,  hi:15,   plo:3,  phi:15,  u:'',       name:'Glasgow'},
+  sf_cr:  {lo:0.1,hi:30,   plo:0.2,phi:15,  u:'mg/dL',  name:'Creatinina'}
+};
+function vrCheck(id){
+  var cfg = VR[id], el = document.getElementById(id), msg = document.getElementById('vr_'+id);
+  if (!cfg || !el) return {state:'empty'};
+  el.classList.remove('vr-bad','vr-warn');
+  if (msg){ msg.className = 'vr-msg'; msg.textContent = ''; }
+  var raw = el.value;
+  if (raw === '' || raw === null) return {state:'empty'};
+  var v = parseFloat(raw);
+  if (isNaN(v)) return {state:'empty'};
+  if (v < cfg.lo || v > cfg.hi){
+    el.classList.add('vr-bad');
+    if (msg){ msg.className = 'vr-msg bad';
+      msg.textContent = '⛔ ' + cfg.name + ' ' + v + (cfg.u ? ' ' + cfg.u : '') + ': FUERA DE RANGO, imposible (' + cfg.lo + '–' + cfg.hi + '). NO entra al cálculo — revisa el tecleo.'; }
+    return {state:'bad', v:v};
+  }
+  /* La app es de ADULTO. 8 años NO es un error de tecleo — es una edad real, y decirle
+     "imposible" sería mentirle al usuario. Lo que está fuera de rango es la APP, no el dato:
+     se dice así y se deja de calcular (los cortes de adulto no aplican a ese paciente). */
+  if (id === 'g_edad' && v < 18){
+    el.classList.add('vr-bad');
+    if (msg){ msg.className = 'vr-msg bad';
+      msg.textContent = '⛔ ' + v + ' años: FUERA DEL ALCANCE de esta app, que es de ADULTO (no es un error de tecleo — es el paciente equivocado). NEWS2 y los cortes de la SSC 2026 no están validados en pediatría: usa la guía pediátrica. No se calcula la meta de PAM.'; }
+    return {state:'bad', v:v};
+  }
+  if (v < cfg.plo || v > cfg.phi){
+    el.classList.add('vr-warn');
+    if (msg){ msg.className = 'vr-msg warn';
+      msg.textContent = '⚠ ' + cfg.name + ' ' + v + (cfg.u ? ' ' + cfg.u : '') + ': fuera del rango habitual (' + cfg.plo + '–' + cfg.phi + ') pero posible. Se calcula igual — confirma que no es un error de tecleo.'; }
+    return {state:'warn', v:v};
+  }
+  return {state:'ok', v:v};
+}
+function vrOk(r){ return r.state === 'ok' || r.state === 'warn'; }
+
 /* ---------- NEWS2 ---------- */
 var newsScale = 1;
 function setScale(s){
@@ -956,22 +1100,25 @@ function scoreSpO2Scale2(v, onO2){
   if (v <= 96) return 2;
   return 3;                          // >=97 con O2
 }
+var NEWS = {total:0, anyThree:false, hasData:false, nBad:0, nMissing:0};
 function calcNews(){
-  var parts = [];
-  var anyThree = false, total = 0, hasData = false;
+  var anyThree = false, total = 0, hasData = false, nBad = 0, nMissing = 0;
   function add(id, fn){
-    var raw = document.getElementById(id).value;
-    if (raw === '' || raw === null) return;
+    var r = vrCheck(id);
+    if (r.state === 'bad'){ nBad++; return; }          // imposible → NO suma
+    if (r.state === 'empty'){ nMissing++; return; }
     hasData = true;
-    var s = fn(parseFloat(raw));
+    var s = fn(r.v);
     total += s; if (s === 3) anyThree = true;
   }
   add('n_rr', scoreRR);
-  var spo2raw = document.getElementById('n_spo2').value;
+  var rSpo2 = vrCheck('n_spo2');
   var onO2 = document.getElementById('n_o2').value === 'o2';
-  if (spo2raw !== ''){
+  if (rSpo2.state === 'bad'){ nBad++; }
+  else if (rSpo2.state === 'empty'){ nMissing++; }
+  else {
     hasData = true;
-    var ss = newsScale === 1 ? scoreSpO2Scale1(parseFloat(spo2raw)) : scoreSpO2Scale2(parseFloat(spo2raw), onO2);
+    var ss = newsScale === 1 ? scoreSpO2Scale1(rSpo2.v) : scoreSpO2Scale2(rSpo2.v, onO2);
     total += ss; if (ss === 3) anyThree = true;
   }
   if (onO2){ total += 2; hasData = true; } // aire/oxígeno: +2 si O2
@@ -980,42 +1127,220 @@ function calcNews(){
   add('n_temp', scoreTemp);
   if (document.getElementById('n_avpu').value === 'CVPU'){ total += 3; anyThree = true; hasData = true; }
 
+  NEWS = {total:total, anyThree:anyThree, hasData:hasData, nBad:nBad, nMissing:nMissing};
+
   var elN = document.getElementById('n_score'), elF = document.getElementById('n_flag'), elM = document.getElementById('n_msg');
-  if (!hasData){ elN.textContent = '—'; elF.className='score-flag flag-ok'; elF.textContent='Sin datos'; elM.textContent=''; return; }
+  if (!hasData){
+    elN.textContent = '—'; elF.className='score-flag flag-ok'; elF.textContent='Sin datos';
+    elM.textContent = nBad ? 'Hay ' + nBad + ' valor(es) imposible(s): corrígelos para poder puntuar.' : '';
+    calcQsofa(); sofaCross(); buildAction(); return;
+  }
   elN.textContent = total;
   elF.className = 'score-flag';
-  if (total >= 7){ elF.classList.add('flag-crit'); elF.textContent = 'Respuesta de emergencia'; elM.textContent = 'NEWS2 ≥7: respuesta clínica de emergencia (RCP 2017).'; }
-  else if (total >= 5 || anyThree){ elF.classList.add('flag-warn'); elF.textContent = 'Revisión urgente'; elM.textContent = (total<5 && anyThree) ? 'Un parámetro individual = 3: gatilla revisión aunque el total sea <5.' : 'NEWS2 ≥5: revisión clínica urgente.'; }
-  else { elF.classList.add('flag-ok'); elF.textContent = 'Bajo'; elM.textContent = 'Riesgo bajo por NEWS2; el juicio clínico manda.'; }
+  var msg = '';
+  if (total >= 7){ elF.classList.add('flag-crit'); elF.textContent = 'Respuesta de emergencia'; msg = 'NEWS2 ≥7: respuesta clínica de emergencia (RCP 2017).'; }
+  else if (total >= 5 || anyThree){ elF.classList.add('flag-warn'); elF.textContent = 'Revisión urgente'; msg = (total<5 && anyThree) ? 'Un parámetro individual = 3: gatilla revisión aunque el total sea <5.' : 'NEWS2 ≥5: revisión clínica urgente.'; }
+  else { elF.classList.add('flag-ok'); elF.textContent = 'Bajo'; msg = 'Riesgo bajo por NEWS2; el juicio clínico manda.'; }
+  /* Un score parcial que se lee como total es un falso tranquilizador: dilo. */
+  if (nBad)     msg += ' ⛔ ' + nBad + ' valor(es) imposible(s) excluido(s): el score está INCOMPLETO y subestima.';
+  if (nMissing) msg += ' ⚠ Faltan ' + nMissing + ' parámetro(s): un NEWS2 parcial solo puede subir, nunca bajar.';
+  elM.textContent = msg;
+  calcQsofa(); sofaCross(); buildAction();
 }
 
-/* ---------- qSOFA ---------- */
+/* ---------- qSOFA · derivado del tablero (no se teclea dos veces) ---------- */
 function calcQsofa(){
-  var n = 0;
-  ['q_rr','q_gcs','q_sbp'].forEach(function(id){ if (document.getElementById(id).checked) n++; });
-  document.getElementById('q_score').textContent = n;
-  var f = document.getElementById('q_flag');
+  var rr = vrCheck('n_rr'), sbp = vrCheck('n_sbp');
+  var okRR = vrOk(rr), okSBP = vrOk(sbp);
+  var cRR  = okRR  && rr.v  >= 22;
+  var cSBP = okSBP && sbp.v <= 100;
+  var cGCS = document.getElementById('n_avpu').value === 'CVPU';
+  document.getElementById('q_rr').checked  = cRR;
+  document.getElementById('q_sbp').checked = cSBP;
+  document.getElementById('q_gcs').checked = cGCS;
+
+  var n = (cRR?1:0) + (cSBP?1:0) + (cGCS?1:0);
+  var have = (okRR?1:0) + (okSBP?1:0) + 1; // la conciencia siempre tiene valor (por defecto "Alerta")
+  var el = document.getElementById('q_score'), f = document.getElementById('q_flag'), m = document.getElementById('q_msg');
   f.className = 'score-flag';
+
+  if (!okRR && !okSBP && !cGCS){
+    el.textContent = '—'; f.classList.add('flag-ok'); f.textContent = 'Sin datos';
+    m.textContent = 'Teclea FR y PA sistólica en el tablero: qSOFA se arma solo.';
+    return;
+  }
+  el.textContent = n;
   if (n >= 2){ f.classList.add('flag-warn'); f.textContent = '≥2 (didáctico)'; }
   else { f.classList.add('flag-ok'); f.textContent = '<2'; }
+  m.textContent = have < 3
+    ? 'Calculado con ' + have + '/3 criterios — faltan datos arriba y un qSOFA incompleto solo puede subir.'
+    : 'Derivado de FR ' + (okRR?rr.v:'—') + ' · PAS ' + (okSBP?sbp.v:'—') + ' · conciencia ' + (cGCS?'no alerta':'alerta') + '.';
 }
 
 /* ---------- PAM ---------- */
 function calcPam(){
-  var e = document.getElementById('g_edad').value;
+  var r = vrCheck('g_edad');
   var f = document.getElementById('g_pam');
-  if (e === ''){ f.className='score-flag flag-ok'; f.textContent='≥ 65 mmHg'; return; }
-  if (parseFloat(e) >= 65){ f.className='score-flag flag-ok'; f.textContent='≥ 65 (o 60–65)'; }
+  if (!vrOk(r)){ f.className='score-flag flag-ok'; f.textContent='≥ 65 mmHg'; return; }
+  if (r.v >= 65){ f.className='score-flag flag-ok'; f.textContent='≥ 65 (o 60–65)'; }
   else { f.className='score-flag flag-ok'; f.textContent='≥ 65 mmHg'; }
 }
 
 /* ---------- Glicemia ---------- */
 function calcGlu(){
-  var g = document.getElementById('g_glu').value;
+  var r = vrCheck('g_glu');
   var f = document.getElementById('g_glu_flag');
-  if (g === ''){ f.className='score-flag flag-ok'; f.textContent='—'; return; }
-  if (parseFloat(g) >= 180){ f.className='score-flag flag-crit'; f.textContent='Iniciar insulina (≥180)'; }
+  if (!vrOk(r)){ f.className='score-flag flag-ok'; f.textContent='—'; return; }
+  if (r.v >= 180){ f.className='score-flag flag-crit'; f.textContent='Iniciar insulina (≥180)'; }
   else { f.className='score-flag flag-ok'; f.textContent='Bajo umbral'; }
+}
+
+/* ================= HOJA DE ACCIÓN =================
+   Regla de esta hoja: SOLO entra lo que la guía fija con número o con "primera línea".
+   Nada de opinión. Cada paso lleva su rec.# + fuerza + link.
+   Sigue siendo abstención: molécula/dosis del ATB (la SSC remite al patrón local),
+   titulación del vasopresor, y el label diagnóstico (lo pone el clínico arriba).     */
+var SSC = 'https://doi.org/10.1097/CCM.0000000000007075';
+var RCP_NEWS = 'https://www.rcp.ac.uk/media/mrllczrj/news2-chart-4_clinical-response-to-news-trigger-thresholds_0.pdf';
+
+function src(txt, url){ return '<div class="act-src">' + (url ? '<a href="'+url+'" target="_blank">'+txt+' ↗</a>' : txt) + '</div>'; }
+function step(tag, when, whenNow, doTxt, why, srcHtml){
+  return '<div class="act-step">' +
+    '<div class="act-n n-'+tag+'">'+tag+'</div>' +
+    '<div class="act-txt">' +
+      '<div class="act-do">' + doTxt + (when ? '<span class="act-when '+(whenNow?'w-now':'')+'">'+when+'</span>' : '') + '</div>' +
+      (why ? '<div class="act-why">'+why+'</div>' : '') + (srcHtml||'') +
+    '</div></div>';
+}
+
+/* Frecuencia de control de vitales — RCP 2017, Chart 4 "Clinical response to NEWS
+   trigger thresholds" (verificado en el PDF oficial del Royal College of Physicians). */
+function newsMonitoring(total, anyThree){
+  if (total >= 7)                 return {f:'Monitorización CONTINUA de signos vitales', r:'Umbral de respuesta de emergencia: evaluación por equipo con competencias de cuidados críticos (incl. manejo avanzado de vía aérea) y considerar traslado a UCI/UTI.'};
+  if (total >= 5)                 return {f:'Control de vitales mínimo cada 1 hora',      r:'Umbral de respuesta urgente: evaluación urgente por clínico competente en paciente agudo y cuidados en un entorno con monitorización.'};
+  if (anyThree)                   return {f:'Control de vitales mínimo cada 1 hora',      r:'3 puntos en un solo parámetro: la enfermera informa al equipo médico, que decide si escala.'};
+  if (total >= 1)                 return {f:'Control de vitales mínimo cada 4–6 horas',   r:'La enfermera evalúa y decide si aumenta la frecuencia o escala.'};
+  return                                 {f:'Control de vitales mínimo cada 12 horas',    r:'Continuar monitorización NEWS de rutina.'};
+}
+
+function buildAction(){
+  var host = document.getElementById('action-sheet');
+  if (!host) return;
+
+  var cat  = document.getElementById('e_cat').value;
+  var peso = vrCheck('g_peso'), edad = vrCheck('g_edad'), glu = vrCheck('g_glu');
+  var sbp  = vrCheck('n_sbp'),  spo2 = vrCheck('n_spo2');
+  var hemo = document.getElementById('p_hemo').checked;
+  var lac  = document.getElementById('p_lac').checked;
+  var atb  = document.getElementById('p_atb').checked;
+  var vol  = document.getElementById('p_vol').checked;
+
+  var volTxt = document.getElementById('g_vol');
+  var mlTotal = vrOk(peso) ? Math.round(peso.v * 30) : null;
+  volTxt.className = 'score-flag flag-ok';
+  volTxt.textContent = mlTotal ? (mlTotal.toLocaleString('es-CL') + ' mL en 3 h') : '—';
+
+  var alta = NEWS.hasData && (NEWS.total >= 5 || NEWS.anyThree);
+  var activa = (cat && cat !== 'baja') || alta;
+  if (!activa){
+    host.innerHTML = '<div class="act-idle"><b>Hoja de acción.</b> En cuanto el tablero marque NEWS2 ≥5 (o 3 en un parámetro), <b>o</b> definas la categoría del paciente, aquí aparece qué hacer con <b>este</b> paciente, en orden y con la fuente de cada línea. Abajo queda la doctrina completa para estudiar.</div>';
+    return;
+  }
+
+  var esShock  = cat === 'shock';
+  var esUrgente = esShock || cat === 'probable';
+  var pasos = '', n = [];
+
+  /* 1 · Hemocultivos antes del ATB */
+  if (!hemo) pasos += step('D','antes del ATB', true,
+    'Toma <b>hemocultivos AHORA</b>, antes de la primera dosis de antibiótico.',
+    'Si ya vas a pinchar, sale ahora. Después del antibiótico el rendimiento cae y esa oportunidad no vuelve.',
+    src('SSC #7 (fuerte): "collecting blood cultures… ideally before the administration of antimicrobial therapy"', SSC));
+
+  /* 2 · Lactato */
+  if (!lac) pasos += step('D','ahora', true,
+    'Mide <b>lactato</b> ahora, y vuelve a medirlo para ver la tendencia.',
+    'Sirve como tendencia, no como umbral: <b>no existe un % de aclaramiento de guía</b>. Un lactato normal no descarta sepsis.',
+    src('SSC #8 (condicional): "we suggest measuring blood lactate"', SSC));
+
+  /* 3 · Antibiótico — ventana SÍ, molécula NO */
+  var win = {shock:   {t:'&lt; 1 HORA', r:'#16 · fuerte',      w:true},
+             probable:{t:'&lt; 1 HORA', r:'#17 · fuerte',      w:true},
+             posible: {t:'&lt; 3 HORAS',r:'#18 · condicional', w:false},
+             baja:    {t:'diferir',    r:'#20 · condicional', w:false}}[cat];
+  if (!atb && cat && cat !== 'baja') pasos += step('D', win.t, win.w,
+    'Administra <b>antibiótico de amplio espectro</b> dentro de la ventana.',
+    'La ventana la fija la guía por tu categoría; en urgencias el GT-LATINFURG cuenta el reloj <b>desde el triaje</b>. <b>Qué molécula y qué dosis NO te lo dice esta app</b> — eso sale del antibiograma y del protocolo de tu servicio (pestaña <b>Antibióticos</b> para orientarte). Principio: amplio precoz → cobertura MDR solo con factores de riesgo → desescalar.',
+    src('SSC ' + win.r + ' · molécula/dosis: #25/#31 remiten a patrones locales · #36 (fuerte) desescalar', SSC));
+
+  /* 4 · Volumen — el número que pediste, con su condición */
+  if (!vol && esUrgente){
+    if (mlTotal){
+      pasos += step('D','en 3 h', esShock,
+        'Inicia cristaloide <b>balanceado</b>: <span class="big">' + mlTotal.toLocaleString('es-CL') + ' mL</span> (30 mL/kg × ' + peso.v + ' kg)' + (esShock ? '' : ', si hay hipoperfusión'),
+        'Punto de partida, <b>no una orden</b>: el statement es condicional y aplica a hipoperfusión inducida por sepsis o shock séptico. Reevaluación dinámica desde el primer bolo; en cardiópata, ERC en diálisis o cirrosis, este volumen puede hacer daño — ahí manda tu juicio, no la cifra.',
+        src('SSC #10 (condicional): "at least 30 mL/kg… within the first 3 hours" · #44 balanceados sobre salino', SSC));
+    } else {
+      n.push('el <b>peso</b> (sin él no puedo calcular los 30 mL/kg — es la única cifra de volumen que la guía fija)');
+    }
+  }
+
+  /* 5 · Meta de PAM */
+  var metaTxt = (vrOk(edad) && edad.v >= 65) ? 'PAM ≥ 65 mmHg (60–65 aceptable a esta edad)' : 'PAM ≥ 65 mmHg';
+  var hipo = vrOk(sbp) && sbp.v < 90;
+  pasos += step('D','meta', esShock,
+    'Meta hemodinámica: <b>' + metaTxt + '</b>.' + (hipo ? ' <span style="color:var(--critical)">PAS ' + sbp.v + ' mmHg: hipotensión.</span>' : ''),
+    'La meta es dura y la fija la guía. <b>La titulación del vasopresor para llegar a ella es tuya</b> — la app no titula.',
+    src('SSC #13 (fuerte) PAM ≥65' + ((vrOk(edad) && edad.v >= 65) ? ' · #14 (condicional) 60–65 si ≥65 años' : ''), SSC));
+
+  /* 6 · Vasopresor — orden SÍ, dosis NO */
+  if (esShock) pasos += step('D','si no responde a fluidos', true,
+    '<b>Noradrenalina de primera línea.</b> Secuencia: noradrenalina → vasopresina → adrenalina.',
+    'No la retrases esperando una vía central: <b>iniciar por vía periférica es aceptable</b> para restaurar la PAM. Dosis y titulación = abstención, las pones tú.',
+    src('SSC #53 (fuerte) noradrenalina 1ª línea · #56/#57 secuencia · #12 inicio periférico', SSC));
+
+  /* 7 · Glicemia */
+  if (vrOk(glu) && glu.v >= 180) pasos += step('D','', false,
+    'Glicemia ' + glu.v + ' mg/dL → <b>inicia insulina</b> (umbral ≥180).',
+    'El umbral es duro; la dosis y la titulación son tuyas.',
+    src('SSC #92 (fuerte)', SSC));
+
+  /* 8 · Control de vitales — RCP Chart 4 */
+  if (NEWS.hasData){
+    var mon = newsMonitoring(NEWS.total, NEWS.anyThree);
+    pasos += step('D','NEWS2 ' + NEWS.total, NEWS.total >= 7,
+      '<b>' + mon.f + '.</b>',
+      mon.r,
+      src('Royal College of Physicians 2017 · NEWS2 Chart 4 "Clinical response to NEWS trigger thresholds"', RCP_NEWS));
+  }
+
+  /* 9 · Control de foco */
+  pasos += step('T','ideal &lt; 6 h', false,
+    'Busca el <b>foco</b> e intervénelo (drenaje, retiro de catéter, cirugía).',
+    'El plazo óptimo es incierto — la guía dice "idealmente dentro de 6 h". Identificar e intervenir el foco es juicio clínico/quirúrgico: ningún antibiótico salva un absceso sin drenar.',
+    src('SSC #24 (condicional): "early source control… ideally within 6 hours"', SSC));
+
+  /* 10 · Destino */
+  if (esUrgente) pasos += step('T','&lt; 6 h', false,
+    'Si requiere UCI, <b>que ingrese dentro de 6 h</b>.',
+    'El destino depende de tu juicio y de los recursos de tu servicio.',
+    src('SSC #15 (condicional): "admitting the patients to the ICU within 6 hours"', SSC));
+
+  /* Qué falta */
+  if (!cat) n.push('la <b>categoría</b> del paciente (arriba a la izquierda) — de ella depende la ventana del antibiótico');
+  if (!vrOk(edad)) n.push('la <b>edad</b> (cambia la meta de PAM si tiene ≥65)');
+  if (NEWS.nBad) n.push('corregir los <b>' + NEWS.nBad + ' valor(es) imposible(s)</b> del tablero');
+
+  var catLabel = {shock:'SHOCK SÉPTICO', probable:'SEPSIS PROBABLE, SIN SHOCK', posible:'INFECCIÓN POSIBLE, SIN SHOCK', baja:'BAJA PROBABILIDAD'}[cat] || 'CRIBADO POSITIVO, CATEGORÍA SIN DEFINIR';
+  var sub = NEWS.hasData ? ('NEWS2 ' + NEWS.total + '/20' + (NEWS.total>=7?' · respuesta de emergencia':(NEWS.total>=5||NEWS.anyThree?' · revisión urgente':''))) : 'sin NEWS2';
+
+  host.innerHTML =
+    '<div class="act' + (esShock || (NEWS.hasData && NEWS.total>=7) ? '' : ' act-warn') + '">' +
+      '<div class="act-head"><h2>▸ Ahora</h2><span class="act-sub"><b>' + catLabel + '</b> · ' + sub + '</span></div>' +
+      '<div class="act-body">' + (pasos || '<div class="act-why" style="padding:10px 0">Marcaste todo lo hecho. Lo que queda es reevaluar: la primera hora no termina con el checklist, termina con el paciente reevaluado.</div>') + '</div>' +
+      (n.length ? '<div class="act-miss"><b>Para completar la hoja falta:</b> ' + n.join(' · ') + '.</div>' : '') +
+      '<div class="act-foot"><b>Esto no es una orden médica.</b> Es lo que las guías fijan con número o con "primera línea" para un paciente con estos datos, con la fuente de cada línea a la vista. Lo que la guía deja al clínico — molécula y dosis del antibiótico, titulación del vasopresor, el diagnóstico — la app no lo inventa. <b>Decides tú.</b></div>' +
+    '</div>';
 }
 
 /* ---------- SOFA (pronóstico · fuera de 1ª hora · NUNCA gatillo) ---------- */
@@ -1032,15 +1357,23 @@ function sfCns(g){ if(g==='')return null; g=parseFloat(g); if(isNaN(g))return nu
   if(g>=15)return 0; if(g>=13)return 1; if(g>=10)return 2; if(g>=6)return 3; return 4; }
 function sfRenal(c){ if(c==='')return null; c=parseFloat(c); if(isNaN(c))return null;
   if(c<1.2)return 0; if(c<2.0)return 1; if(c<3.5)return 2; if(c<5.0)return 3; return 4; }
+var sofaBad = 0;
+/* Un valor imposible NO puede puntuar. Antes, GCS 20 → sfCns devolvía 0 = "cerebro sano" en
+   verde: el error de tecleo hacia arriba pintaba normal. Ahora sale del cálculo y se avisa. */
+function sofaVal(id){
+  var r = vrCheck(id);
+  if (r.state === 'bad'){ sofaBad++; return ''; }   // '' → el scorer devuelve null → no suma
+  return vrOk(r) ? r.v : '';
+}
 function calcSofa(){
-  var val = function(id){ return document.getElementById(id).value; };
+  sofaBad = 0;
   var scores = {
-    sc_resp:  sfResp(val('sf_pf'), document.getElementById('sf_sup').checked),
-    sc_coag:  sfCoag(val('sf_plt')),
-    sc_liver: sfLiver(val('sf_bili')),
-    sc_cv:    sfCv(val('sf_map'), val('sf_vaso')),
-    sc_cns:   sfCns(val('sf_gcs')),
-    sc_renal: sfRenal(val('sf_cr'))
+    sc_resp:  sfResp(sofaVal('sf_pf'), document.getElementById('sf_sup').checked),
+    sc_coag:  sfCoag(sofaVal('sf_plt')),
+    sc_liver: sfLiver(sofaVal('sf_bili')),
+    sc_cv:    sfCv(sofaVal('sf_map'), document.getElementById('sf_vaso').value),
+    sc_cns:   sfCns(sofaVal('sf_gcs')),
+    sc_renal: sfRenal(sofaVal('sf_cr'))
   };
   var total = 0, n = 0;
   for (var k in scores){
@@ -1050,13 +1383,46 @@ function calcSofa(){
       : (s >= 3 ? 'var(--critical)' : (s >= 1 ? 'var(--attention)' : 'var(--ok)'));
     if (s !== null){ total += s; n++; }
   }
+  sofaCross();
   var t = document.getElementById('sf_total'), f = document.getElementById('sf_flag');
   document.getElementById('sf_ncount').textContent = n;
-  if (n === 0){ t.textContent = '–'; f.className='score-flag flag-ok'; f.textContent='Sin datos'; return; }
+  if (n === 0){
+    t.textContent = '–'; f.className='score-flag flag-ok';
+    f.textContent = sofaBad ? 'Fuera de rango' : 'Sin datos';
+    return;
+  }
   t.textContent = total;
   f.className = 'score-flag';
+  if (sofaBad){ f.classList.add('flag-crit'); f.textContent = 'INCOMPLETO · ' + sofaBad + ' fuera de rango'; return; }
   if (total >= 2){ f.classList.add('flag-warn'); f.textContent = (n<6 ? 'ΔSOFA ≥2 (parcial)' : 'ΔSOFA ≥2'); }
   else { f.classList.add('flag-ok'); f.textContent = (n<6 ? 'Parcial' : 'Sin disfunción'); }
+}
+
+/* ---------- Coherencia cruzada: cada dato por sí solo es posible, juntos no ----------
+   Un rango por campo no atrapa al paciente imposible: atrapa al número imposible.
+   Estos dos contradicen la física o contradicen otro dato ya tecleado. */
+function sofaCross(){
+  var box = document.getElementById('vr_sofa_cross');
+  if (!box) return;
+  box.className = 'vr-msg'; box.textContent = '';
+  var avisos = [];
+  var map = vrCheck('sf_map'), sbp = vrCheck('n_sbp'), gcs = vrCheck('sf_gcs');
+  var avpu = document.getElementById('n_avpu').value;
+
+  /* La PAM es una media entre sistólica y diastólica: no puede superar a la sistólica. */
+  if (vrOk(map) && vrOk(sbp) && map.v > sbp.v)
+    avisos.push('⛔ PAM ' + map.v + ' > PA sistólica ' + sbp.v + ': imposible (la PAM es una media, siempre queda por debajo de la sistólica). Uno de los dos está mal tecleado.');
+
+  /* El mismo paciente no puede estar "Alerta" arriba y con GCS de coma abajo. */
+  if (vrOk(gcs) && gcs.v <= 12 && avpu === 'A')
+    avisos.push('⚠ Glasgow ' + gcs.v + ' pero arriba marcaste conciencia "Alerta": es el mismo paciente. Un GCS ≤12 no es un paciente alerta — corrige el que esté mal.');
+  if (vrOk(gcs) && gcs.v === 15 && avpu === 'CVPU')
+    avisos.push('⚠ Glasgow 15 pero arriba marcaste "Confusión nueva / V / P / U": contradictorio. Ojo: la confusión aguda puede dar GCS 15 y aun así puntuar en NEWS2 — si es el caso, ignora este aviso.');
+
+  if (avisos.length){
+    box.className = 'vr-msg ' + (avisos[0].indexOf('⛔') === 0 ? 'bad' : 'warn');
+    box.innerHTML = avisos.join('<br>');
+  }
 }
 
 /* ---------- Bibliografía: modo Ácido-Base (citas clicables + modal) ---------- */
@@ -1268,11 +1634,12 @@ function casoDelDia(){ var k=Object.keys(CASES); var d=new Date(); var i=(d.getF
 function loadCase(id){
   var c=CASES[id]; if(!c) return; var L=c.L;
   if(L.scale) setScale(L.scale);
-  ['n_rr','n_spo2','n_sbp','n_hr','n_temp','g_edad','g_glu','sf_pf','sf_plt','sf_bili','sf_map','sf_gcs','sf_cr'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value=L[k]; } });
-  ['n_o2','n_avpu','sf_vaso'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value=L[k]; } });
-  ['q_rr','q_gcs','q_sbp'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.checked=!!L[k]; } });
+  ['n_rr','n_spo2','n_sbp','n_hr','n_temp','g_edad','g_peso','g_glu','sf_pf','sf_plt','sf_bili','sf_map','sf_gcs','sf_cr'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value=L[k]; } });
+  ['n_o2','n_avpu','sf_vaso','e_cat'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value=L[k]; } });
+  /* qSOFA ya no se carga: se deriva del tablero en calcQsofa(). */
+  ['p_hemo','p_lac','p_atb','p_vol'].forEach(function(k){ var e=document.getElementById(k); if(e) e.checked=!!L[k]; });
   var s=document.getElementById('sf_sup'); if(s) s.checked=!!L.sf_sup;
-  calcNews(); calcQsofa(); calcPam(); calcGlu(); calcSofa();
+  calcNews(); calcQsofa(); calcPam(); calcGlu(); calcSofa(); buildAction();
   window.scrollTo({top:0,behavior:'smooth'});
   var t=document.getElementById('case-toast');
   if(t){ t.textContent='✓ Caso cargado — mira cómo se computan los scores en el tablero'; t.style.display='block';
@@ -1333,6 +1700,7 @@ function showTab(id, btn){
 }
 calcQsofa();
 calcSofa();
+buildAction();
 renderRefList();
 renderCases();
 </script>
