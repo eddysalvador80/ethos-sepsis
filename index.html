@@ -345,6 +345,7 @@ body {
           <button data-s="2" onclick="setScale(2)">Escala 2 (hipercápnico)</button>
         </span>
       </div>
+      <div class="mini-note" style="margin:-2px 0 8px"><b>Escala 2 solo</b> si hay hipercapnia <b>confirmada en gasometría</b> + meta prescrita 88-92% + decisión registrada (RCP recs. 25-27). En cualquier otro caso, Escala 1. <span style="color:var(--attention)">Ponerla por reflejo en todo EPOC vuelve el score falsamente tranquilizador</span> (un 88% puntuaría 0 en vez de 3).</div>
       <div class="field">
         <label>SpO₂ (%)</label>
         <input type="number" id="n_spo2" oninput="calcNews()" placeholder="—">
@@ -692,7 +693,19 @@ body {
           <dt>Qué mide</dt><dd>7 signos: FR, SpO₂, O₂ suplementario, PAS, FC, temperatura y conciencia. Es el tablero de la izquierda.</dd>
           <dt>Cuándo</dt><dd>Cribado de entrada (SSC 2026 lo recomienda <b>sobre</b> qSOFA). <b>≥5</b> = revisión urgente · <b>≥7</b> = emergencia · un solo parámetro en 3 también alerta.</dd>
           <dt>Su límite</dt><dd>No específico: se activa con cualquier deterioro, no solo sepsis (por eso: siempre + sospecha de infección).</dd>
-          <dt>Fuente</dt><dd><a class="cite" href="https://www.rcp.ac.uk/media/a4ibkkbf/news2-final-report_0_0.pdf" target="_blank">RCP 2017</a>; SSC 2026 #4.</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('news2')">RCP 2017</a>; <a class="cite" onclick="rc('ssc2026')">SSC 2026 #4</a>.</dd>
+        </dl>
+      </div>
+
+      <div class="tool-card" style="border-left-color:var(--attention)">
+        <h4>Las dos escalas de SpO₂ del NEWS2 <span style="font-weight:400;color:var(--text-mute)">— y la trampa del EPOC</span></h4>
+        <dl>
+          <dt>Escala 1</dt><dd><b>La de todo el mundo.</b> ≤91 → 3 · 92-93 → 2 · 94-95 → 1 · ≥96 → 0.</dd>
+          <dt>Escala 2</dt><dd><b>La excepción</b>, solo para el que <b>retiene CO₂</b>. Exige <b>tres candados</b>: (1) hipercapnia <b>confirmada en gasometría</b> —en este ingreso o en uno previo—, (2) que <b>requiera O₂ suplementario</b>, (3) <b>meta prescrita de 88-92%</b>. Y la decisión <b>la toma un clínico competente y se registra en la ficha</b>. <i>"In all other circumstances, the regular NEWS SpO₂ scale 1 should be used."</i></dd>
+          <dt>Cortes E-2</dt><dd>≤83 → 3 · 84-85 → 2 · 86-87 → 1 · <b>88-92 → 0</b> · <b>93-94 con O₂ → 1</b> · <b>95-96 con O₂ → 2</b> · <b>≥97 con O₂ → 3</b>.</dd>
+          <dt>El porqué</dt><dd>Fíjate en la <b>inversión</b>: aquí <b>saturar alto PUNTÚA</b>. En el retenedor de CO₂ la hiperoxia no es un premio — empeora la hipercapnia y lo lleva a la narcosis. Detalle fino: <b>≥93 respirando AIRE puntúa 0</b>; solo se castiga la hiperoxia <b>que causas tú con oxígeno</b>.</dd>
+          <dt>⚠ La trampa</dt><dd><b>No pongas a todo EPOC en Escala 2 por reflejo.</b> Si no es retenedor confirmado, un paciente saturando 88% te puntúa <b>0 en vez de 3</b>: el score te tranquiliza mientras se deteriora. La escala equivocada no es un matiz — <b>te ciega</b>.</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('news2')">RCP 2017</a>, recs. 25-27. El propio gráfico advierte: <i>"ONLY use Scale 2 under the direction of a qualified clinician."</i></dd>
         </dl>
       </div>
 
@@ -752,6 +765,8 @@ body {
         <div><b>SIRS</b> — respuesta inflamatoria sistémica; ≥2 de 4 (temperatura, FC, FR/PaCO₂, leucocitos). Sensible, poco específico.</div>
         <div><b>qSOFA</b> — quick SOFA; ≥2 de 3 (FR ≥22, Glasgow ≤14, PAS ≤100). Ya no se usa como cribado.</div>
         <div><b>NEWS2</b> — National Early Warning Score 2; score de deterioro de 7 signos. Cribado preferido; ≥5 urgente, ≥7 emergencia.</div>
+        <div><b>SpO₂ Escala 1</b> — la escala de SpO₂ por defecto del NEWS2, para todo paciente: ≤91→3, 92-93→2, 94-95→1, ≥96→0.</div>
+        <div><b>SpO₂ Escala 2</b> — escala alternativa <b>solo</b> para hipercapnia confirmada en gasometría con meta prescrita 88-92% (decisión de un clínico competente, registrada en ficha). Invierte la lógica: saturar alto <b>con O₂</b> puntúa (≥97 con O₂ → 3), porque la hiperoxia daña al retenedor de CO₂; ≥93 <b>al aire</b> puntúa 0. Usarla por reflejo en todo EPOC vuelve el score falsamente tranquilizador.</div>
         <div><b>SOFA</b> — puntaje de disfunción de 6 órganos (0–24). Pronóstico, no gatillo.</div>
         <div><b>PAM</b> — presión arterial media; meta ≥65 mmHg (60–65 si ≥65 años).</div>
         <div><b>Lactato</b> — marcador de hipoperfusión; se usa su <b>tendencia</b> (seriado), no un umbral fijo.</div>
