@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETHOS · Sepsis — Tutor primera hora v1.0</title>
-<meta name="description" content="Sepsis del adulto · primera hora. Apoyo clínico docente anclado a evidencia. Prototipo en validación.">
+<meta name="theme-color" content="#0e1014">
+<!-- Open Graph / difusión (mantener sincronizado con el repo publicado) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://eddysalvador80.github.io/ethos-sepsis/">
 <meta property="og:title" content="ETHOS·Sepsis — apoyo clínico docente">
@@ -16,7 +17,6 @@
 <meta name="twitter:title" content="ETHOS·Sepsis — apoyo clínico docente">
 <meta name="twitter:description" content="Sepsis del adulto · primera hora. Apoyo clínico docente anclado a evidencia. Prototipo en validación.">
 <meta name="twitter:image" content="https://eddysalvador80.github.io/ethos-sepsis/og-image.png">
-<meta name="theme-color" content="#0e1014">
 <style>
 :root {
   --bg: #f3f5f8;
@@ -418,6 +418,7 @@ body {
       <button class="main-tab active" onclick="showTab('primera',this)">Primera hora</button>
       <button class="main-tab" onclick="showTab('aprender',this)">Aprender</button>
       <button class="main-tab" onclick="showTab('practica',this)">Práctica</button>
+      <button class="main-tab" onclick="showTab('atb',this)">Antibióticos</button>
       <button class="main-tab" onclick="showTab('deriv',this)">Derivaciones</button>
       <button class="main-tab" onclick="showTab('ref',this)">Referencias</button>
     </div>
@@ -499,7 +500,7 @@ body {
         </div>
         <div class="decision">
           <div class="decision-title"><span class="type-tag tag-A">A</span> Elección de molécula / dosis del ATB</div>
-          <div class="decision-note">El sistema se abstiene y deriva al <b>antibiograma y protocolo local de su servicio</b>. Enseña el principio: amplio espectro precoz, cobertura MDR solo si hay factores, desescalar.</div>
+          <div class="decision-note">El sistema no ordena la dosis de <i>este</i> paciente: se abstiene y deriva al <b>antibiograma y protocolo local de su servicio</b>. Pero sí te <b>orienta</b>: mira la pestaña <b>Antibióticos</b> — esquema guía frecuente por foco, con dosis de referencia y su fuente. Principio: amplio espectro precoz, cobertura MDR solo si hay factores, desescalar.</div>
           <div class="receipt"><a class="cite" href="https://doi.org/10.1097/CCM.0000000000007075" target="_blank">SSC #25/#31</a> (remiten a patrones locales) · #36 (fuerte, desescalar).</div>
           <div class="slot">◇ <b>Espacio para el antibiograma y esquema empírico de su servicio.</b> La guía manda derivar a los patrones locales — aquí es donde las moléculas y dosis de ustedes hacen la app suya. Lo incorporamos juntos.</div>
         </div>
@@ -749,6 +750,96 @@ body {
       <div id="case-list"></div>
     </div>
 
+    <!-- ===== ANTIBIÓTICOS EMPÍRICOS (referencia + orientación por foco) ===== -->
+    <div class="tab-panel" id="tab-atb">
+      <div class="note-box" style="background:var(--attention-bg);border-color:var(--attention-border);color:var(--text-dim)">
+        <b style="color:var(--attention)">⚠ Referencia, no orden.</b> Esta tabla es material <b>docente de consulta</b>. <b>El antibiograma local manda</b> (<a class="cite" onclick="rc('ssc2026')">SSC 2026 #25/#31</a>): ajusta siempre a tu protocolo y patrón de resistencia local, a la <b>función renal, peso, alergia</b> y factores de <b>MDR</b>. La app no receta a tu paciente — <b>tú decides y firmas</b>.
+      </div>
+      <div class="note-box"><b>Cómo usarla.</b> Identifica el foco probable y mira el <b>esquema guía frecuente</b> para ese foco: eso es "lo que haría una guía" — el punto de partida, no el punto final. La molécula y la dosis definitivas salen de tu antibiograma y tu juicio. Desescala apenas tengas cultivos (<a class="cite" onclick="rc('ssc2026')">SSC #36</a>).</div>
+
+      <div class="tool-card">
+        <h4>🫁 Respiratorio — NAC grave <span class="ref-badge" style="margin-left:4px">Chile</span></h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>S. pneumoniae, H. influenzae, atípicos (Legionella, Mycoplasma en grave).</dd>
+          <dt>Sala</dt><dd>Ampicilina/sulbactam <b>3 g c/6-8 h IV</b> (ceftriaxona 2 g/día IV <i>solo</i> si no hay betalactámico+inhibidor).</dd>
+          <dt>UPC / grave</dt><dd>Ampicilina/sulbactam <b>3 g c/6 h IV</b> (o ceftriaxona 1 g c/12 h) <b>+ macrólido SIEMPRE</b>: azitromicina 500 mg/día IV/VO o claritromicina 500 mg c/12 h VO.</dd>
+          <dt>MDR</dt><dd><b>No</b> cubrir SARM ni Pseudomonas empíricamente si no hay factores de riesgo.</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('minsal2024')">MINSAL 2024 (Chile)</a></dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4>🫁 Respiratorio nosocomial — HAP / VAP</h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>S. aureus (incl. SARM), P. aeruginosa, otros gram-negativos.</dd>
+          <dt>Esquema</dt><dd><b>Anti-SARM:</b> vancomicina 15 mg/kg IV c/8-12 h (carga 25-30 mg/kg si grave) <i>o</i> linezolid 600 mg IV c/12 h. <b>+ Antipseudomónico:</b> pip-tazo <b>4,5 g IV c/6 h</b> · cefepime 2 g IV c/8 h · meropenem 1 g IV c/8 h · ceftazidima 2 g IV c/8 h.</dd>
+          <dt>MDR</dt><dd>Añadir 2º gram-negativo de <i>otra clase</i> (cipro 400 mg c/8 h · levofloxacino 750 mg c/24 h · amikacina 15-20 mg/kg c/24 h). <b>Evitar 2 betalactámicos.</b></dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('kalil2016')">IDSA/ATS 2016</a></dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4>🚻 Urinario — pielonefritis complicada / urosepsis <span class="ref-badge" style="margin-left:4px">Chile</span></h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>Enterobacterales (E. coli, Klebsiella…).</dd>
+          <dt>Esquema</dt><dd>No expuesto a UPC (0-7 días): ampicilina/sulbactam <b>3 g c/8 h EV</b> ± amikacina. Más de 8 días: pip-tazo 4,5 g c/6 h + amikacina.</dd>
+          <dt>MDR</dt><dd>Expuesto a UPC / colonización por multirresistente: <b>imipenem</b> ± amikacina (si shock).</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('barrosluco2024')">PROA Barros Luco 2024 (Chile)</a></dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4>🩻 Abdominal — infección intraabdominal complicada</h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>Enterobacterales + anaerobios entéricos (± enterococo y Candida si es asociada a cuidados o paciente crítico).</dd>
+          <dt>Principio</dt><dd>Cubrir <b>gram-negativos entéricos + anaerobios</b>, y <b>controlar el foco</b> (el antibiótico solo no basta).</dd>
+          <dt>Esquema</dt><dd>Pip-tazo <b>4,5 g IV c/6 h</b> <i>o</i> meropenem 1 g IV c/8 h (grave / riesgo BLEE). Alternativa: cefalosporina + metronidazol (dosis según tu protocolo).</dd>
+          <dt>MDR</dt><dd>Carbapenémico si riesgo de BLEE; valorar cobertura de Candida en crítico o asociada a cuidados.</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('sis2017')">SIS 2017</a> (elección del esquema) · dosis estándar de <a class="cite" onclick="rc('kalil2016')">IDSA/ATS 2016</a>. <span style="color:var(--attention)">Honestidad: el texto completo de SIS es de pago; las dosis provienen de la fuente estándar citada, no de la guía abdominal.</span></dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4>🩹 Piel y partes blandas — fascitis necrosante / celulitis grave</h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>Polimicrobiana (mixta aerobios-anaerobios) o monomicrobiana (estreptococo grupo A, SARM comunitario).</dd>
+          <dt>Esquema</dt><dd>Vancomicina <b>30 mg/kg/día IV en 2 dosis</b> (o linezolid 600 mg IV c/12 h) <b>+</b> pip-tazo <b>3,375 g IV c/6-8 h</b> o meropenem 1 g IV c/8 h. <b>La cirugía manda</b>: sin desbridamiento no hay cura.</dd>
+          <dt>Dirigido</dt><dd>Estreptococo grupo A documentado: penicilina 2-4 millones U IV c/4-6 h + <b>clindamicina 600-900 mg IV c/8 h</b> (supresión de toxina).</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('stevens2014')">IDSA 2014</a>. <span style="color:var(--attention)">Nota: el valle de vancomicina 15-20 es pre-2020; hoy se dosifica por AUC.</span></dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4>🧠 SNC — meningitis bacteriana aguda <span class="ref-badge" style="margin-left:4px">Chile</span></h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>S. pneumoniae, N. meningitidis; <b>Listeria</b> si &gt;50 años o inmunosupresión.</dd>
+          <dt>Esquema</dt><dd><b>Dexametasona 0,15 mg/kg c/6 h EV — ANTES del primer antibiótico</b> + ceftriaxona <b>2 g c/12 h EV</b> + <b>ampicilina 2 g c/4 h EV</b> (Listeria) + aciclovir 10 mg/kg c/8 h EV si sospecha de encefalitis.</dd>
+          <dt>Variante</dt><dd>Riesgo de Listeria: &gt;50 años, inmunosupresión, diabetes, hepatopatía/alcoholismo, embarazo → mantener ampicilina. <b>Suspender dexametasona</b> si el agente NO es neumococo.</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('barrosluco2024')">PROA Barros Luco 2024 (Chile)</a> — concordante con IDSA (Tunkel 2004, Clin Infect Dis 39:1267-1284).</dd>
+        </dl>
+      </div>
+
+      <div class="tool-card">
+        <h4>💉 Catéter / torrente sanguíneo (CRBSI)</h4>
+        <dl>
+          <dt>Gérmenes</dt><dd>Estafilococo coagulasa-negativo, S. aureus (incl. SARM), gram-negativos, Candida.</dd>
+          <dt>Esquema</dt><dd><b>Vancomicina</b> empírica donde hay SARM (rec 23, A-II). <b>Gram-negativos: según susceptibilidad LOCAL y gravedad</b> — cefalosporina 4ª gen, carbapenémico o betalactámico/inhibidor ± aminoglucósido (rec 25, A-II). <b>Equinocandina</b> si riesgo de Candida: NPT, ATB prolongado, neoplasia hematológica, trasplante, catéter femoral, colonización múltiple (rec 28/29).</dd>
+          <dt>Conducta</dt><dd><b>Retirar el catéter</b> en CRBSI por gram-negativos, S. aureus, enterococo, hongos o micobacterias (rec 32, A-II).</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('mermel2009')">IDSA 2009 (Mermel)</a>. <span style="color:var(--attention)">La guía NO fija dosis: remite explícitamente a los datos locales.</span></dd>
+        </dl>
+      </div>
+
+      <div class="tool-card" style="border-left-color:var(--tA)">
+        <h4><span class="type-tag tag-A">A</span> Foco desconocido — sepsis sin foco claro</h4>
+        <dl>
+          <dt>Realidad</dt><dd><b>No existe un esquema único de guía</b> para el foco desconocido. Aquí el tutor <b>se abstiene y deriva</b>: manda tu antibiograma local.</dd>
+          <dt>Principio</dt><dd>Amplio espectro guiado por el patrón local: betalactámico antipseudomónico (pip-tazo 4,5 g IV c/6 h o meropenem 1 g IV c/8 h) <b>± anti-SARM</b> (vancomicina) según riesgo. <b>Desescalar</b> apenas haya cultivos.</dd>
+          <dt>Y sobre todo</dt><dd><b>Buscar el foco</b>: la mayor ganancia no es el espectro, es encontrar y controlar la fuente.</dd>
+          <dt>Fuente</dt><dd><a class="cite" onclick="rc('ssc2026')">SSC 2026</a> (#25/#31 patrones locales · #36 desescalar) · dosis estándar de <a class="cite" onclick="rc('kalil2016')">IDSA/ATS 2016</a>.</dd>
+        </dl>
+      </div>
+    </div>
+
     <!-- ===== DERIVACIONES ===== -->
     <div class="tab-panel" id="tab-deriv">
       <div class="prohib">
@@ -756,7 +847,7 @@ body {
         <ol>
           <li>Countdown de antibiótico por paciente. <span style="color:var(--text-mute)">(Se muestra la tabla estratificada, nunca un reloj para ESTE paciente.)</span></li>
           <li>Volumen de fluidos como número-titular u orden. <span style="color:var(--text-mute)">(30 mL/kg solo como calculadora opt-in subordinada.)</span></li>
-          <li>Dosis o titulación de cualquier fármaco (ATB, vasopresor, insulina, diurético).</li>
+          <li>Ordenar la dosis o titulación <b>para ESTE paciente</b> (ATB, vasopresor, insulina, diurético). <span style="color:var(--text-mute)">(La pestaña <b>Antibióticos</b> es una tabla de <i>referencia</i> por foco: el ajuste al antibiograma local, a la función renal y al paciente —y la firma— son tuyos.)</span></li>
           <li>Estampar el label diagnóstico "es sepsis".</li>
         </ol>
       </div>
@@ -975,12 +1066,20 @@ const REFS = {
   adrenal2018:{a:'cortico',tag:'Landmark',short:'ADRENAL 2018',autores:'Venkatesh B, Finfer S, Cohen J, et al.',titulo:'Adjunctive Glucocorticoid Therapy in Patients with Septic Shock',rev:'N Engl J Med 2018;378(9):797-808',id:'PMID 29347874 · DOI 10.1056/NEJMoa1705835',hz:'Hidrocortisona: sin ↓ mortalidad a 90 d, pero el shock revierte más rápido.',url:'https://doi.org/10.1056/NEJMoa1705835'},
   aprocchss2018:{a:'cortico',tag:'Landmark',short:'APROCCHSS 2018',autores:'Annane D, Renault A, Brun-Buisson C, et al.',titulo:'Hydrocortisone plus Fludrocortisone for Adults with Septic Shock',rev:'N Engl J Med 2018;378(9):809-818',id:'PMID 29490185 · DOI 10.1056/NEJMoa1705716',hz:'Hidrocortisona + fludrocortisona: SÍ bajó mortalidad a 90 d. Contrasta con ADRENAL.',url:'https://doi.org/10.1056/NEJMoa1705716'},
   // — Procalcitonina —
-  saps2016:{a:'pct',tag:'Landmark',short:'SAPS 2016',autores:'de Jong E, van Oers JA, Beishuizen A, et al.',titulo:'Efficacy and safety of procalcitonin guidance in reducing the duration of antibiotic treatment',rev:'Lancet Infect Dis 2016;16(7):819-827',id:'PMID 26947523 · DOI 10.1016/S1473-3099(16)00053-0',hz:'La guía por procalcitonina acorta la duración del antibiótico con seguridad.',url:'https://doi.org/10.1016/S1473-3099(16)00053-0'}
+  saps2016:{a:'pct',tag:'Landmark',short:'SAPS 2016',autores:'de Jong E, van Oers JA, Beishuizen A, et al.',titulo:'Efficacy and safety of procalcitonin guidance in reducing the duration of antibiotic treatment',rev:'Lancet Infect Dis 2016;16(7):819-827',id:'PMID 26947523 · DOI 10.1016/S1473-3099(16)00053-0',hz:'La guía por procalcitonina acorta la duración del antibiótico con seguridad.',url:'https://doi.org/10.1016/S1473-3099(16)00053-0'},
+  // — Terapia empírica por foco —
+  minsal2024:{a:'atbemp',tag:'Chile',short:'MINSAL 2024 — NAC',autores:'Ministerio de Salud de Chile (DIPRECE)',titulo:'Uso de antimicrobianos para neumonía en adultos',rev:'MINSAL, Chile, agosto 2024',id:'Documento oficial MINSAL/DIPRECE',hz:'NAC grave/UPC: ampicilina/sulbactam 3 g c/6 h IV + macrólido SIEMPRE. No cubrir SARM/Pseudomonas empíricamente sin factores de riesgo. Prefiere penicilina+inhibidor sobre cefalosporina 3ª gen.',url:'https://diprece.minsal.cl/wp-content/uploads/2024/08/2024.08.27_USO-ANTIMICROBIANOS-PARA-NEUMONIA-EN-ADULTOS.pdf'},
+  barrosluco2024:{a:'atbemp',tag:'Chile',short:'PROA Barros Luco 2024',autores:'Hospital Barros Luco Trudeau, Chile',titulo:'Guía de tratamiento antimicrobiano PROA-04, V1 (vigencia 2027)',rev:'Chile, julio 2024',id:'Documento institucional chileno',hz:'Esquemas chilenos verbatim: pielonefritis complicada/urosepsis y meningitis aguda del adulto.',url:'https://www.hospitalbarrosluco.gob.cl/wp-content/uploads/2024/08/PROA-04-GUIA-DE-TRATAMIENTO-ANTIMICROBIANO-V1.pdf'},
+  kalil2016:{a:'atbemp',tag:'Guía',short:'IDSA/ATS 2016 — HAP/VAP',autores:'Kalil AC, Metersky ML, Klompas M, et al.',titulo:'Management of Adults With Hospital-acquired and Ventilator-associated Pneumonia',rev:'Clin Infect Dis 2016;63(5):e61-e111',id:'PMID 27418577 · DOI 10.1093/cid/ciw353',hz:'Esquema por columnas: anti-SARM + antipseudomónico ± 2º gram-negativo si riesgo MDR. Fuente de las dosis estándar de adulto.',url:'https://doi.org/10.1093/cid/ciw353'},
+  stevens2014:{a:'atbemp',tag:'Guía',short:'IDSA 2014 — piel/partes blandas',autores:'Stevens DL, Bisno AL, Chambers HF, et al.',titulo:'Practice Guidelines for the Diagnosis and Management of Skin and Soft Tissue Infections',rev:'Clin Infect Dis 2014;59(2):e10-e52',id:'PMID 24947530 · DOI 10.1093/cid/ciu296',hz:'Fascitis necrosante: vanco o linezolid + pip-tazo o carbapenémico. Estrepto grupo A: penicilina + clindamicina (antitoxina).',url:'https://doi.org/10.1093/cid/ciu296'},
+  mermel2009:{a:'atbemp',tag:'Guía',short:'IDSA 2009 — catéter (CRBSI)',autores:'Mermel LA, Allon M, Bouza E, et al.',titulo:'Clinical Practice Guidelines for the Diagnosis and Management of Intravascular Catheter-Related Infection',rev:'Clin Infect Dis 2009;49(1):1-45',id:'PMID 19489710 · DOI 10.1086/599376',hz:'Vancomicina empírica donde hay SARM (rec 23, A-II); gram-negativos SEGÚN SUSCEPTIBILIDAD LOCAL y gravedad (rec 25, A-II); equinocandina si riesgo de Candida (rec 29); retirar el catéter según patógeno (rec 32). La guía NO fija dosis: remite a lo local.',url:'https://doi.org/10.1086/599376'},
+  sis2017:{a:'atbemp',tag:'Guía',short:'SIS 2017 — intraabdominal',autores:'Mazuski JE, Tessier JM, May AK, et al.',titulo:'The Surgical Infection Society Revised Guidelines on the Management of Intra-Abdominal Infection',rev:'Surg Infect (Larchmt) 2017;18(1):1-76',id:'PMID 28085573 · DOI 10.1089/sur.2016.261',hz:'Elección del esquema empírico en infección intraabdominal complicada: cubrir gram-negativos entéricos + anaerobios. (Texto completo de pago: las dosis se toman de la fuente estándar citada.)',url:'https://doi.org/10.1089/sur.2016.261'}
 };
 const REF_AREAS = [
   ['ancla','Anclajes · guías madre'],['cribado','Cribado y definiciones'],['atb','Antibiótico · timing'],
   ['cultivo','Hemocultivos'],['lactato','Lactato y perfusión'],['volumen','Fluidos · volumen y estrategia'],
-  ['tipo','Fluidos · tipo'],['presor','Vasopresores y meta de PAM'],['cortico','Corticoides'],['pct','Procalcitonina']
+  ['tipo','Fluidos · tipo'],['presor','Vasopresores y meta de PAM'],['cortico','Corticoides'],['pct','Procalcitonina'],
+  ['atbemp','Terapia antibiótica empírica por foco']
 ];
 function openRefModal(key){
   var r = REFS[key]; if(!r) return;
