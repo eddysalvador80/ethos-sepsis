@@ -288,6 +288,28 @@ body {
 .case-reveal b { color: var(--text); }
 .case-toast { display: none; background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok); border-radius: 8px; padding: 9px 13px; font-size: 12.5px; font-weight: 600; margin-bottom: 13px; }
 
+/* ---- Práctica v2: recuperación activa + racha ---- */
+.p-header { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 12px 15px; margin-bottom: 14px; }
+.p-stats { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-dim); }
+.p-stats b { color: var(--text); font-size: 14px; }
+.p-bar { height: 6px; background: var(--bg-elev3); border-radius: 999px; margin-top: 9px; overflow: hidden; }
+.p-bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s; }
+.case-hoy { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.case-badge-hoy { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: var(--accent); border-radius: 5px; padding: 2px 8px; margin-bottom: 8px; }
+.case-ok { color: var(--ok); font-weight: 700; }
+.case-foco { font-size: 10.5px; font-weight: 600; color: var(--text-mute); background: var(--bg-elev2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 9px; margin-left: 6px; white-space: nowrap; }
+.case-q { font-size: 13.5px; font-weight: 600; color: var(--text); margin: 13px 0 9px; padding-top: 11px; border-top: 1px solid var(--border-soft); }
+.case-opts { display: flex; flex-direction: column; gap: 7px; }
+.case-opts button { text-align: left; border: 1px solid var(--border); background: var(--bg-elev2); color: var(--text); border-radius: 8px; padding: 9px 13px; font-size: 12.5px; cursor: pointer; font-family: inherit; transition: .12s; }
+.case-opts button:hover { border-color: var(--tD); background: var(--info-bg); }
+.case-opts button.opt-ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); font-weight: 600; }
+.case-opts button.opt-no { border-color: var(--critical); background: var(--critical-bg); color: var(--critical); }
+.case-fb { display: none; margin-top: 11px; padding: 11px 13px; border-radius: 8px; font-size: 12.5px; line-height: 1.55; }
+.case-fb.fb-ok { background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--text-dim); }
+.case-fb.fb-no { background: var(--attention-bg); border: 1px solid var(--attention-border); color: var(--text-dim); }
+.case-fb b { color: var(--text); }
+.case-trampa { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-dim); font-style: italic; }
+
 .foot { grid-column: 1 / -1; text-align: center; color: var(--text-mute); font-size: 11px; padding: 18px 0 6px; font-family: ui-monospace, Menlo, monospace; }
 
 @media (max-width: 900px) {
@@ -746,7 +768,7 @@ body {
 
     <!-- ===== PRÁCTICA ===== -->
     <div class="tab-panel" id="tab-practica">
-      <div class="note-box"><b>Aprende haciendo.</b> Cada caso <b>carga el tablero de la izquierda</b> (NEWS2 · qSOFA · SOFA · gatillos) para que veas los scores computarse sobre un paciente real. Piensa tu conducta de la primera hora <b>antes</b> de abrir "Ver conducta". El clínico decides tú.</div>
+      <div class="note-box"><b>Aprende decidiendo.</b> Cada caso <b>carga el tablero</b> (NEWS2 · qSOFA · SOFA · gatillos) sobre un paciente real. Luego <b>decides tú antes de ver la respuesta</b> — y recibes feedback de <i>lo que elegiste</i>, con la trampa del caso y su fuente. Tu racha y tu progreso se guardan en este equipo. <b>12 casos</b>, incluidas las trampas que de verdad matan: el anciano sin fiebre, el qSOFA tranquilizador, el lactato con presión normal, el foco no controlado.</div>
       <div id="case-list"></div>
     </div>
 
@@ -1113,57 +1135,178 @@ function renderRefList(){
   box.innerHTML = html + '<div class="ref-count">'+Object.keys(REFS).length+' referencias · cada PMID/DOI verificado en fuente</div>';
 }
 
-/* ---------- Práctica: casos que cargan el tablero ---------- */
+/* ---------- Práctica: recuperación activa + racha (crea hábito) ---------- */
 const CASES = {
-  c1:{ titulo:'Shock séptico por neumonía · 68 a',
-    vineta:'Hombre de 68 años, tos y fiebre 3 días, hoy somnoliento e hipotenso. FR 32, SpO₂ 89% con O₂, PA 82/48, FC 124, T 38,9 °C, confuso. Glucosa 212.',
-    load:{ scale:1, n_rr:32, n_spo2:89, n_o2:'o2', n_sbp:82, n_hr:124, n_temp:38.9, n_avpu:'CVPU',
-      q_rr:true, q_gcs:true, q_sbp:true, g_edad:68, g_glu:212,
-      sf_pf:220, sf_sup:false, sf_plt:90, sf_bili:1.5, sf_map:60, sf_vaso:'none', sf_gcs:13, sf_cr:1.8 },
-    conducta:'<b>Es shock séptico</b> (hipotensión + hipoperfusión). NEWS2 muy alto, qSOFA 3. Primera hora: hemocultivos + lactato <b>antes</b> del antibiótico (<a class="cite" onclick="rc(\'cheng2019\')">FABLED</a>); <b>antibiótico &lt;1 h</b> por antibiograma local (<a class="cite" onclick="rc(\'kumar2006\')">Kumar</a>); cristaloides ~30 mL/kg reevaluando; <b>noradrenalina precoz</b> para PAM ≥65 (<a class="cite" onclick="rc(\'soap2010\')">SOAP II</a>, <a class="cite" onclick="rc(\'sepsispam2014\')">SEPSISPAM</a>); glucosa ≥180 → insulina. La categoría "shock" la pusiste tú; la app no la infiere.' },
-  c2:{ titulo:'Sepsis urinaria sin shock · 79 a',
-    vineta:'Mujer de 79 años, disuria y fiebre, decaída pero orientada. FR 24, SpO₂ 93% aire, PA 108/64, FC 106, T 38,6 °C, alerta. Glucosa 150.',
-    load:{ scale:1, n_rr:24, n_spo2:93, n_o2:'air', n_sbp:108, n_hr:106, n_temp:38.6, n_avpu:'A',
-      q_rr:true, q_gcs:false, q_sbp:false, g_edad:79, g_glu:150,
-      sf_pf:'', sf_sup:false, sf_plt:140, sf_bili:'', sf_map:78, sf_vaso:'none', sf_gcs:15, sf_cr:1.3 },
-    conducta:'<b>Sepsis probable sin shock.</b> NEWS2 ≥5 (revisión urgente), qSOFA 1 — recuerda: qSOFA es poco sensible, no te fíes de él para descartar (<a class="cite" onclick="rc(\'fernando2018\')">Fernando</a>). Primera hora: hemocultivos + lactato; <b>antibiótico &lt;1 h</b> por ser sepsis probable (<a class="cite" onclick="rc(\'ferrer2014\')">Ferrer</a>); fluidos si hay hipoperfusión (reevaluando); vigilancia estrecha. Aún no necesita vasopresor.' },
-  c3:{ titulo:'Sospecha, sin shock · 30 a',
-    vineta:'Hombre de 30 años, odinofagia y fiebre, buen estado general. FR 22, SpO₂ 96% aire, PA 122/76, FC 98, T 38,4 °C, alerta. Glucosa 120.',
-    load:{ scale:1, n_rr:22, n_spo2:96, n_o2:'air', n_sbp:122, n_hr:98, n_temp:38.4, n_avpu:'A',
-      q_rr:true, q_gcs:false, q_sbp:false, g_edad:30, g_glu:120,
-      sf_pf:'', sf_sup:false, sf_plt:'', sf_bili:'', sf_map:90, sf_vaso:'none', sf_gcs:15, sf_cr:'' },
-    conducta:'<b>Infección posible, baja probabilidad de sepsis.</b> NEWS2 bajo, sin disfunción orgánica. Aquí el tutor <b>se abstiene del label</b> y enseña a no sobre-tratar: si la probabilidad es baja, la guía permite <b>diferir el antibiótico y reevaluar</b> (hasta 3 h desde el triaje) en vez de disparar (<a class="cite" onclick="rc(\'churpek2017\')">Churpek</a>). El juicio clínico manda.' }
+ c1:{t:'Shock séptico por neumonía · 68 a',f:'Respiratorio',
+  v:'Tos y fiebre 3 días; hoy somnoliento e hipotenso. FR 32, SpO₂ 89% con O₂, PA 82/48, FC 124, T 38,9 °C, confuso. Lactato 4,1. Glucosa 212.',
+  L:{scale:1,n_rr:32,n_spo2:89,n_o2:'o2',n_sbp:82,n_hr:124,n_temp:38.9,n_avpu:'CVPU',q_rr:true,q_gcs:true,q_sbp:true,g_edad:68,g_glu:212,sf_pf:220,sf_sup:false,sf_plt:90,sf_bili:1.5,sf_map:60,sf_vaso:'none',sf_gcs:13,sf_cr:1.8},
+  q:'¿Cuándo debe entrar el antibiótico?',
+  o:[{t:'Dentro de 1 hora',ok:true,f:'Hay <b>shock</b> (hipotensión + hipoperfusión): la ventana es &lt;1 h, lo antes posible, sin esperar certeza diagnóstica.'},
+     {t:'Hasta 3 horas',ok:false,f:'Esa ventana es para <b>infección posible SIN shock</b>. Aquí hay shock: cada hora de retraso cuesta supervivencia.'},
+     {t:'Diferir y reevaluar',ok:false,f:'No. Diferir es para <b>baja probabilidad</b> de infección. Este paciente está en shock.'}],
+  tr:'La categoría (¿shock?) la pones tú — la app no la infiere.',
+  c:'Hemocultivos + lactato <b>antes</b> del ATB (<a class="cite" onclick="rc(\'cheng2019\')">FABLED</a>) · <b>ATB &lt;1 h</b> por antibiograma local (<a class="cite" onclick="rc(\'kumar2006\')">Kumar</a>) · cristaloides reevaluando · <b>noradrenalina precoz</b> para PAM ≥65 (<a class="cite" onclick="rc(\'soap2010\')">SOAP II</a>, <a class="cite" onclick="rc(\'sepsispam2014\')">SEPSISPAM</a>) · glucosa ≥180 → insulina.'},
+ c2:{t:'Sepsis urinaria sin shock · 79 a',f:'Urinario',
+  v:'Disuria y fiebre, decaída pero orientada. FR 24, SpO₂ 93% aire, PA 108/64, FC 106, T 38,6 °C, alerta. Lactato 1,8.',
+  L:{scale:1,n_rr:24,n_spo2:93,n_o2:'air',n_sbp:108,n_hr:106,n_temp:38.6,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:false,g_edad:79,g_glu:150,sf_pf:'',sf_sup:false,sf_plt:140,sf_bili:'',sf_map:78,sf_vaso:'none',sf_gcs:15,sf_cr:1.3},
+  q:'Su qSOFA es 1. ¿Puedes bajar la guardia?',
+  o:[{t:'No: NEWS2 manda y está alto',ok:true,f:'<b>qSOFA es poco sensible</b> (60,8%): un qSOFA bajo NO descarta sepsis. El NEWS2 y tu ojo clínico mandan.'},
+     {t:'Sí, qSOFA &lt;2 la descarta',ok:false,f:'Trampa clásica. qSOFA tiene sensibilidad de solo <b>60,8%</b> — deja pasar 4 de cada 10. Por eso la SSC 2026 lo sacó del cribado.'},
+     {t:'Solo si el lactato es normal',ok:false,f:'El lactato normal tampoco descarta: la sepsis es <b>diagnóstico clínico</b>, no de un solo marcador (SSC #5).'}],
+  tr:'qSOFA no sirve para DESCARTAR. Sirvió para enseñar por qué se abandonó.',
+  c:'Sepsis probable sin shock: hemocultivos + lactato · <b>ATB &lt;1 h</b> (<a class="cite" onclick="rc(\'ferrer2014\')">Ferrer</a>) · fluidos solo si hay hipoperfusión, reevaluando · vigilancia estrecha (<a class="cite" onclick="rc(\'fernando2018\')">Fernando</a>).'},
+ c3:{t:'Odinofagia y fiebre · 30 a',f:'Baja probabilidad',
+  v:'Buen estado general, camina solo. FR 22, SpO₂ 96% aire, PA 122/76, FC 98, T 38,4 °C, alerta. Sin disfunción orgánica.',
+  L:{scale:1,n_rr:22,n_spo2:96,n_o2:'air',n_sbp:122,n_hr:98,n_temp:38.4,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:false,g_edad:30,g_glu:120,sf_pf:'',sf_sup:false,sf_plt:'',sf_bili:'',sf_map:90,sf_vaso:'none',sf_gcs:15,sf_cr:''},
+  q:'¿Antibiótico de amplio espectro ya?',
+  o:[{t:'No: diferir y reevaluar',ok:true,f:'Baja probabilidad de sepsis, sin disfunción orgánica: la guía permite <b>diferir y reevaluar</b>. Sobre-tratar también daña.'},
+     {t:'Sí, por si acaso',ok:false,f:'Aquí está el otro error, el silencioso: <b>sobre-tratar</b>. Sin shock ni disfunción, disparar amplio espectro genera resistencia y daño.'},
+     {t:'Sí, pero solo si el NEWS2 sube',ok:false,f:'Casi: reevaluar está bien, pero la decisión no cuelga de un score — cuelga de tu evaluación clínica seriada.'}],
+  tr:'El tutor NO estampa "es sepsis". Aquí se abstiene y te devuelve el juicio.',
+  c:'Infección posible, baja probabilidad: <b>diferir el ATB y reevaluar</b> (hasta 3 h desde el triaje) · buscar foco · red de seguridad y control (<a class="cite" onclick="rc(\'churpek2017\')">Churpek</a>).'},
+ c4:{t:'Anciano confuso, SIN fiebre · 84 a',f:'Trampa: el anciano',
+  v:'Traído por confusión y "decaimiento". FR 24, SpO₂ 92% aire, PA 96/54, FC 104, <b>T 35,2 °C</b>, confuso. Vive en residencia; ITU reciente.',
+  L:{scale:1,n_rr:24,n_spo2:92,n_o2:'air',n_sbp:96,n_hr:104,n_temp:35.2,n_avpu:'CVPU',q_rr:true,q_gcs:true,q_sbp:true,g_edad:84,g_glu:180,sf_pf:'',sf_sup:false,sf_plt:120,sf_bili:'',sf_map:64,sf_vaso:'none',sf_gcs:13,sf_cr:2.1},
+  q:'No tiene fiebre. ¿Descartas sepsis?',
+  o:[{t:'No: la hipotermia es señal de gravedad',ok:true,f:'El anciano séptico a menudo <b>no hace fiebre</b> — puede estar hipotérmico, y eso marca PEOR pronóstico. La confusión nueva puede ser el único signo.'},
+     {t:'Sí, sin fiebre no hay infección',ok:false,f:'Error que mata. Ausencia de fiebre <b>no descarta</b>; T &lt;36 °C es criterio de SIRS y señal de gravedad en el anciano.'},
+     {t:'Espero a que haga fiebre',ok:false,f:'Esperar es perder la ventana. En el anciano, confusión + hipotensión + taquipnea ya obligan a actuar.'}],
+  tr:'En el anciano la sepsis se disfraza: sin fiebre, sin leucocitosis, solo "está raro".',
+  c:'Actuar como sepsis: cribar (NEWS2 lo caza), hemocultivos + lactato, buscar foco (ITU probable), ATB precoz, reanimar con reevaluación. La <b>confusión nueva</b> es disfunción orgánica.'},
+ c5:{t:'Lactato 4,2 con presión "normal"',f:'Trampa: shock críptico',
+  v:'Fiebre y dolor lumbar. FR 24, SpO₂ 94% aire, <b>PA 106/70</b>, FC 112, T 38,5 °C, alerta. <b>Lactato 4,2</b>. Piel moteada, llene capilar 4 s.',
+  L:{scale:1,n_rr:24,n_spo2:94,n_o2:'air',n_sbp:106,n_hr:112,n_temp:38.5,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:false,g_edad:61,g_glu:170,sf_pf:'',sf_sup:false,sf_plt:130,sf_bili:'',sf_map:74,sf_vaso:'none',sf_gcs:15,sf_cr:1.6},
+  q:'La presión está "bien". ¿Puedes esperar?',
+  o:[{t:'No: hay hipoperfusión pese a la presión',ok:true,f:'<b>shock críptico</b>. Lactato 4,2 + moteado + llene 4 s = hipoperfusión tisular aunque la PA parezca normal. Actúa ya.'},
+     {t:'Sí, sin hipotensión no hay shock',ok:false,f:'La hipotensión es TARDÍA. El lactato y la perfusión periférica delatan el shock antes de que caiga la presión.'},
+     {t:'Repito el lactato en 6 h',ok:false,f:'Demasiado tarde. El lactato se sigue como <b>tendencia</b>, pero un 4,2 con moteado exige reanimar ahora, no observar.'}],
+  tr:'La presión normal tranquiliza y engaña. Mira la perfusión.',
+  c:'Reanimar por hipoperfusión: hemocultivos + ATB precoz, cristaloides reevaluando, <b>lactato seriado</b> como tendencia (<a class="cite" onclick="rc(\'jones2010\')">Jones</a>) y perfusión periférica (<a class="cite" onclick="rc(\'andromeda2019\')">ANDROMEDA-SHOCK</a>).'},
+ c6:{t:'Ya lleva 4 L y sigue hipotenso',f:'Fluidos',
+  v:'Shock séptico abdominal. Recibió <b>4 L de cristaloide</b> en 3 h. Sigue PAM 58. Ahora edema, crépitos bibasales, SpO₂ cayendo.',
+  L:{scale:1,n_rr:28,n_spo2:90,n_o2:'o2',n_sbp:84,n_hr:118,n_temp:38.2,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:true,g_edad:57,g_glu:165,sf_pf:180,sf_sup:false,sf_plt:95,sf_bili:2.2,sf_map:58,sf_vaso:'none',sf_gcs:15,sf_cr:2.4},
+  q:'¿Le das otro bolo de fluido?',
+  o:[{t:'No: es momento de vasopresor',ok:true,f:'Tras el bolo inicial, <b>más fluido no gana</b> a pasar a vasopresor precoz — y ya hay señales de sobrecarga (crépitos, SpO₂ cayendo).'},
+     {t:'Sí, hasta completar 30 mL/kg',ok:false,f:'Los 30 mL/kg son un <b>PISO, no una meta rígida</b>. Con edema y congestión, seguir llenando daña.'},
+     {t:'Sí, un bolo más y evalúo',ok:false,f:'El reflejo de "un bolo más" es el que ahoga. La evidencia no muestra beneficio de escalar fluido frente a vasopresor precoz.'}],
+  tr:'El 30 mL/kg no es un mandato: reevaluar es parte de la orden.',
+  c:'Pasar a <b>noradrenalina</b> para PAM ≥65 (<a class="cite" onclick="rc(\'soap2010\')">SOAP II</a>) · dejar de llenar (<a class="cite" onclick="rc(\'clovers2023\')">CLOVERS</a>, <a class="cite" onclick="rc(\'classic2022\')">CLASSIC</a>) · <b>controlar el foco</b> abdominal · pensar de-resucitación tras la fase aguda.'},
+ c7:{t:'Peritonitis postoperatoria · 62 a',f:'Abdominal · foco',
+  v:'3.º día post colectomía. Fiebre, dolor difuso, abdomen en tabla. FR 26, PA 94/58, FC 116, T 38,8 °C. Ya recibió antibiótico de amplio espectro hace 6 h y no mejora.',
+  L:{scale:1,n_rr:26,n_spo2:93,n_o2:'air',n_sbp:94,n_hr:116,n_temp:38.8,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:true,g_edad:62,g_glu:190,sf_pf:'',sf_sup:false,sf_plt:105,sf_bili:1.9,sf_map:68,sf_vaso:'none',sf_gcs:15,sf_cr:1.7},
+  q:'Ya tiene antibiótico y no mejora. ¿Qué falta?',
+  o:[{t:'Control del foco (cirugía/drenaje)',ok:true,f:'<b>Sin control del foco el antibiótico no basta.</b> Una dehiscencia o colección no se cura con espectro: se drena.'},
+     {t:'Ampliar el espectro antibiótico',ok:false,f:'Reflejo frecuente y equivocado. Si hay foco no controlado, ampliar espectro no reemplaza el drenaje quirúrgico.'},
+     {t:'Añadir antifúngico',ok:false,f:'Puede considerarse en asociada a cuidados/crítico, pero <b>no es lo que falta</b>: falta el control del foco.'}],
+  tr:'"No mejora con antibiótico" casi siempre significa: foco no controlado.',
+  c:'Imagen urgente + <b>control de foco precoz</b>, idealmente &lt;6 h (<a class="cite" onclick="rc(\'ssc2026\')">SSC #24</a>) · reevaluar el esquema con el antibiograma (<a class="cite" onclick="rc(\'sis2017\')">SIS 2017</a>) · reanimación en paralelo.'},
+ c8:{t:'Cefalea, fiebre y rigidez de nuca · 58 a',f:'SNC',
+  v:'Cefalea intensa, fiebre 39 °C, rigidez de nuca, somnoliento. FR 22, PA 118/70, FC 104. Sospecha de meningitis bacteriana.',
+  L:{scale:1,n_rr:22,n_spo2:95,n_o2:'air',n_sbp:118,n_hr:104,n_temp:39.0,n_avpu:'CVPU',q_rr:true,q_gcs:true,q_sbp:false,g_edad:58,g_glu:140,sf_pf:'',sf_sup:false,sf_plt:210,sf_bili:'',sf_map:86,sf_vaso:'none',sf_gcs:14,sf_cr:1.0},
+  q:'¿Qué va PRIMERO?',
+  o:[{t:'Dexametasona, antes del antibiótico',ok:true,f:'La <b>dexametasona va ANTES del primer antibiótico</b> (o con él): después pierde su efecto sobre la respuesta inflamatoria.'},
+     {t:'Antibiótico y luego dexametasona',ok:false,f:'Trampa de secuencia. Dar el corticoide DESPUÉS pierde el beneficio: debe preceder al ATB.'},
+     {t:'TAC y punción lumbar antes de todo',ok:false,f:'No retrases el tratamiento por la imagen. Si hay demora, <b>dexametasona + ATB primero</b>; la PL después.'}],
+  tr:'Es un caso donde el ORDEN importa tanto como el fármaco. Y a los >50 a: cubrir Listeria.',
+  c:'<b>Dexametasona 0,15 mg/kg c/6 h EV antes del ATB</b> + ceftriaxona 2 g c/12 h + <b>ampicilina 2 g c/4 h</b> (Listeria, &gt;50 a) + aciclovir si sospecha de encefalitis (<a class="cite" onclick="rc(\'barrosluco2024\')">PROA Barros Luco</a>). Ver pestaña Antibióticos.'},
+ c9:{t:'Dolor desproporcionado en la pierna · 49 a',f:'Piel y partes blandas',
+  v:'Diabético. Dolor <b>desproporcionado</b> al aspecto, eritema que avanza en horas, crepitación, bulas. FR 28, PA 92/56, FC 122, T 38,7 °C.',
+  L:{scale:1,n_rr:28,n_spo2:94,n_o2:'air',n_sbp:92,n_hr:122,n_temp:38.7,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:true,g_edad:49,g_glu:245,sf_pf:'',sf_sup:false,sf_plt:88,sf_bili:'',sf_map:66,sf_vaso:'none',sf_gcs:15,sf_cr:1.5},
+  q:'¿Qué cambia el desenlace aquí?',
+  o:[{t:'El desbridamiento quirúrgico urgente',ok:true,f:'En fascitis necrosante <b>la cirugía manda</b>: el antibiótico acompaña, no cura. Cada hora de demora quirúrgica cuesta vidas.'},
+     {t:'El antibiótico de amplio espectro',ok:false,f:'Es necesario pero <b>no suficiente</b>: sin desbridamiento, la fascitis progresa igual.'},
+     {t:'Esperar el resultado de la imagen',ok:false,f:'La imagen no debe retrasar el pabellón. Es diagnóstico <b>clínico-quirúrgico</b>.'}],
+  tr:'Dolor desproporcionado + progresión rápida = quirófano, no observación.',
+  c:'<b>Cirugía urgente</b> + vancomicina 30 mg/kg/día en 2 dosis (o linezolid) + pip-tazo o carbapenémico; si estrepto grupo A: penicilina + <b>clindamicina</b> antitoxina (<a class="cite" onclick="rc(\'stevens2014\')">IDSA 2014</a>).'},
+ c10:{t:'Fiebre en hemodiálisis, con catéter · 66 a',f:'Catéter / torrente',
+  v:'Fiebre y calofríos durante la diálisis, catéter tunelizado hace 2 meses. FR 24, PA 100/60, FC 110, T 38,9 °C. Sin otro foco evidente.',
+  L:{scale:1,n_rr:24,n_spo2:95,n_o2:'air',n_sbp:100,n_hr:110,n_temp:38.9,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:true,g_edad:66,g_glu:155,sf_pf:'',sf_sup:false,sf_plt:150,sf_bili:'',sf_map:73,sf_vaso:'none',sf_gcs:15,sf_cr:5.4},
+  q:'Además del antibiótico, ¿qué es imprescindible?',
+  o:[{t:'Hemocultivos y valorar retirar el catéter',ok:true,f:'En bacteriemia asociada a catéter, <b>el catéter es el foco</b>: se retira si el agente es S. aureus, gram-negativo, enterococo u hongo.'},
+     {t:'Solo antibiótico, el catéter se salva',ok:false,f:'Peligroso: dejar el catéter con esos agentes perpetúa la bacteriemia y siembra a distancia.'},
+     {t:'Cambiar el catéter por una guía',ok:false,f:'No es la respuesta general: con esos patógenos la conducta es <b>retirar</b>, no recambiar sobre guía.'}],
+  tr:'El foco no siempre es un órgano: a veces es un dispositivo.',
+  c:'Hemocultivos (periférico + catéter) · vancomicina empírica si SARM · gram-negativos <b>según antibiograma local</b> y gravedad · <b>retirar el catéter</b> según patógeno (<a class="cite" onclick="rc(\'mermel2009\')">Mermel 2009</a>).'},
+ c11:{t:'NEWS2 9, pero ¿es sepsis? · 71 a',f:'Trampa: no todo es sepsis',
+  v:'Disnea súbita, dolor torácico pleurítico. FR 30, SpO₂ 88% aire, PA 104/68, FC 118, T 37,1 °C, alerta. <b>Sin foco infeccioso</b>. Postoperada de cadera hace 10 días.',
+  L:{scale:1,n_rr:30,n_spo2:88,n_o2:'air',n_sbp:104,n_hr:118,n_temp:37.1,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:false,g_edad:71,g_glu:130,sf_pf:'',sf_sup:false,sf_plt:190,sf_bili:'',sf_map:80,sf_vaso:'none',sf_gcs:15,sf_cr:1.1},
+  q:'El NEWS2 está alto. ¿Activas código sepsis?',
+  o:[{t:'No: NEWS2 no es específico, falta infección',ok:true,f:'NEWS2 detecta <b>deterioro</b>, no infección. Sin sospecha de infección no hay sepsis: aquí huele a <b>TEP</b> (postoperada, disnea súbita, pleurítico).'},
+     {t:'Sí, NEWS2 ≥7 es sepsis',ok:false,f:'Confusión frecuente. NEWS2 alto = paciente que se deteriora, por la causa que sea. Sepsis exige <b>infección + disfunción</b>.'},
+     {t:'Sí, y además anticoagulo',ok:false,f:'Activar sepsis aquí desvía el diagnóstico. El score alerta; el diagnóstico lo pones tú.'}],
+  tr:'El score abre la puerta, no la cierra. Anclarse en "sepsis" ciega ante el TEP.',
+  c:'Reconocer que el cribado es <b>sensible pero no específico</b>: buscar la causa del deterioro. La app <b>no estampa el label</b> "es sepsis" (<a class="cite" onclick="rc(\'ssc2026\')">SSC #5</a>) — te enseña a interpretar y te devuelve la decisión.'},
+ c12:{t:'Shock que no responde a vasopresor · 70 a',f:'Corticoides',
+  v:'Shock séptico urinario. Reanimado, con noradrenalina en dosis crecientes hace 4 h y sigue con PAM 60. FR 28, FC 120, T 38,4 °C.',
+  L:{scale:1,n_rr:28,n_spo2:93,n_o2:'o2',n_sbp:86,n_hr:120,n_temp:38.4,n_avpu:'A',q_rr:true,q_gcs:false,q_sbp:true,g_edad:70,g_glu:200,sf_pf:200,sf_sup:false,sf_plt:85,sf_bili:2.0,sf_map:60,sf_vaso:'d3',sf_gcs:15,sf_cr:2.2},
+  q:'¿Qué dice la evidencia sobre añadir corticoides?',
+  o:[{t:'Se sugieren; revierten antes el shock, con debate en mortalidad',ok:true,f:'<b>ADRENAL</b>: revierte el shock más rápido pero sin bajar mortalidad a 90 d. <b>APROCCHSS</b>: sí la bajó. La guía los <b>sugiere</b> en shock que requiere vasopresor.'},
+     {t:'No: está probado que no sirven',ok:false,f:'Demasiado tajante. APROCCHSS mostró beneficio en mortalidad; el debate sigue abierto.'},
+     {t:'Sí: reducen la mortalidad sin discusión',ok:false,f:'Tampoco. ADRENAL fue neutro en mortalidad. Enseñar la controversia es más honesto que fingir certeza.'}],
+  tr:'Dos ensayos grandes, resultados distintos. La app te muestra la tensión, no la disuelve.',
+  c:'Shock con vasopresor: corticoides <b>sugeridos</b> (<a class="cite" onclick="rc(\'ssc2026\')">SSC #79</a>); la <b>dosis/esquema es tuya</b> — el statement no la fija. Contraste: <a class="cite" onclick="rc(\'adrenal2018\')">ADRENAL</a> vs <a class="cite" onclick="rc(\'aprocchss2018\')">APROCCHSS</a>.'}
 };
+var PKEY='ethos_sepsis_practica';
+function pState(){ try{ return JSON.parse(localStorage.getItem(PKEY))||{done:{},racha:0,mejor:0}; }catch(e){ return {done:{},racha:0,mejor:0}; } }
+function pSave(s){ try{ localStorage.setItem(PKEY, JSON.stringify(s)); }catch(e){} }
+function casoDelDia(){ var k=Object.keys(CASES); var d=new Date(); var i=(d.getFullYear()*372+d.getMonth()*31+d.getDate())%k.length; return k[i]; }
 function loadCase(id){
-  var c = CASES[id]; if(!c) return; var L = c.load;
+  var c=CASES[id]; if(!c) return; var L=c.L;
   if(L.scale) setScale(L.scale);
-  ['n_rr','n_spo2','n_sbp','n_hr','n_temp','g_edad','g_glu','sf_pf','sf_plt','sf_bili','sf_map','sf_gcs','sf_cr'].forEach(function(k){
-    if(k in L){ var e=document.getElementById(k); if(e) e.value = L[k]; }
-  });
-  ['n_o2','n_avpu','sf_vaso'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value = L[k]; } });
-  ['q_rr','q_gcs','q_sbp'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.checked = !!L[k]; } });
-  if('sf_sup' in L){ var s=document.getElementById('sf_sup'); if(s) s.checked = !!L.sf_sup; }
+  ['n_rr','n_spo2','n_sbp','n_hr','n_temp','g_edad','g_glu','sf_pf','sf_plt','sf_bili','sf_map','sf_gcs','sf_cr'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value=L[k]; } });
+  ['n_o2','n_avpu','sf_vaso'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.value=L[k]; } });
+  ['q_rr','q_gcs','q_sbp'].forEach(function(k){ if(k in L){ var e=document.getElementById(k); if(e) e.checked=!!L[k]; } });
+  var s=document.getElementById('sf_sup'); if(s) s.checked=!!L.sf_sup;
   calcNews(); calcQsofa(); calcPam(); calcGlu(); calcSofa();
-  window.scrollTo({top:0, behavior:'smooth'});
-  var t = document.getElementById('case-toast');
-  if(t){ t.style.display='block'; clearTimeout(window._ctto); window._ctto=setTimeout(function(){t.style.display='none';},3500); }
+  window.scrollTo({top:0,behavior:'smooth'});
+  var t=document.getElementById('case-toast');
+  if(t){ t.textContent='✓ Caso cargado — mira cómo se computan los scores en el tablero'; t.style.display='block';
+    clearTimeout(window._ctto); window._ctto=setTimeout(function(){t.style.display='none';},3500); }
 }
-function toggleConducta(id){
-  var d = document.getElementById('cd-'+id);
-  d.style.display = (d.style.display==='block') ? 'none' : 'block';
+function answer(id, i){
+  var c=CASES[id], op=c.o[i], st=pState();
+  var box=document.getElementById('fb-'+id);
+  var first=!st.done[id];
+  if(first){
+    if(op.ok){ st.done[id]=1; st.racha=(st.racha||0)+1; if(st.racha>(st.mejor||0)) st.mejor=st.racha; }
+    else { st.racha=0; }
+    pSave(st);
+  }
+  box.className='case-fb '+(op.ok?'fb-ok':'fb-no');
+  box.innerHTML='<b>'+(op.ok?'✓ Correcto':'✗ Revisemos')+'</b> — '+op.f+
+    (c.tr?'<div class="case-trampa">🔑 '+c.tr+'</div>':'')+
+    '<div style="margin-top:9px"><button class="case-toggle" onclick="toggleConducta(\''+id+'\')">Ver conducta completa ▾</button></div>';
+  box.style.display='block';
+  Array.from(document.querySelectorAll('#opt-'+id+' button')).forEach(function(b,j){
+    b.classList.toggle('opt-ok', c.o[j].ok); b.classList.toggle('opt-no', !c.o[j].ok && j===i); b.disabled=false;
+  });
+  pHeader();
+}
+function toggleConducta(id){ var d=document.getElementById('cd-'+id); d.style.display=(d.style.display==='block')?'none':'block'; }
+function pHeader(){
+  var st=pState(), n=Object.keys(CASES).length, hechos=Object.keys(st.done||{}).length;
+  var h=document.getElementById('p-header'); if(!h) return;
+  h.innerHTML='<div class="p-stats"><span><b>'+hechos+'</b>/'+n+' casos</span>'+
+    '<span>🔥 racha <b>'+(st.racha||0)+'</b></span><span>★ mejor <b>'+(st.mejor||0)+'</b></span></div>'+
+    '<div class="p-bar"><i style="width:'+Math.round(hechos/n*100)+'%"></i></div>';
 }
 function renderCases(){
-  var box = document.getElementById('case-list'); if(!box) return;
-  var html = '';
+  var box=document.getElementById('case-list'); if(!box) return;
+  var st=pState(), hoy=casoDelDia(), html='';
+  html+='<div id="case-toast" class="case-toast"></div><div id="p-header" class="p-header"></div>';
   Object.keys(CASES).forEach(function(k){
-    var c = CASES[k];
-    html += '<div class="case-card"><div class="case-tit">'+c.titulo+'</div>'+
-      '<div class="case-vin">'+c.vineta+'</div>'+
-      '<div class="case-actions"><button class="case-load" onclick="loadCase(\''+k+'\')">↙ Cargar en el tablero</button>'+
-      '<button class="case-toggle" onclick="toggleConducta(\''+k+'\')">Ver conducta ▾</button></div>'+
-      '<div class="case-reveal" id="cd-'+k+'">'+c.conducta+'</div></div>';
+    var c=CASES[k], done=!!(st.done||{})[k];
+    html+='<div class="case-card'+(k===hoy?' case-hoy':'')+'">'+
+      (k===hoy?'<div class="case-badge-hoy">★ Caso del día</div>':'')+
+      '<div class="case-tit">'+(done?'<span class="case-ok">✓</span> ':'')+c.t+' <span class="case-foco">'+c.f+'</span></div>'+
+      '<div class="case-vin">'+c.v+'</div>'+
+      '<div class="case-actions"><button class="case-load" onclick="loadCase(\''+k+'\')">↙ Cargar en el tablero</button></div>'+
+      '<div class="case-q">'+c.q+'</div><div class="case-opts" id="opt-'+k+'">'+
+      c.o.map(function(o,i){ return '<button onclick="answer(\''+k+'\','+i+')">'+o.t+'</button>'; }).join('')+
+      '</div><div class="case-fb" id="fb-'+k+'"></div>'+
+      '<div class="case-reveal" id="cd-'+k+'">'+c.c+'</div></div>';
   });
-  box.innerHTML = '<div id="case-toast" class="case-toast">✓ Caso cargado — mira el tablero (arriba a la izquierda)</div>' + html;
+  box.innerHTML=html; pHeader();
 }
 
 /* ---------- Tabs ---------- */
