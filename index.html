@@ -3,14 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETHOS · Sepsis — Tutor primera hora v1.1</title>
-<meta name="theme-color" content="#0e1014">
-<!-- Sin caché: una app clínica NUNCA debe servirse desde una copia vieja del navegador.
-     Una v1.0 en pantalla puntúa un GCS 20 como "normal" en verde. El usuario no tiene
-     forma de saber que está viendo una versión superada: se fuerza la revalidación. -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<title>ETHOS · Sepsis — Tutor primera hora v1.2</title>
+<meta name="theme-color" content="#2D5A4A">
+<!-- PWA: instalable en el teléfono y utilizable sin señal, que es donde se usa. -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icono-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ETHOS·Sx">
+<!-- Revalidar siempre: una app clínica no debe servirse desde una copia vieja (una v1.0
+     puntuaría un GCS 20 como "normal" en verde y el usuario no tendría cómo saberlo).
+     Se revalida, pero NO se prohíbe almacenar: la app instalada tiene que poder
+     guardarse para funcionar sin señal. De la frescura se encarga el service worker,
+     que va a la red primero y solo usa la copia guardada si no hay conexión. -->
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <!-- Open Graph / difusión (mantener sincronizado con el repo publicado) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://eddysalvador80.github.io/ethos-sepsis/">
@@ -997,7 +1003,7 @@ input.vr-warn { border-color: var(--attention) !important; background: var(--att
 
   </div>
 
-  <div class="foot">ETHOS · Sepsis <b>v1.1</b> (16-jul-2026) — tutor docente estático · anclado en codebook v2 (congelado) · núcleo y tabla SOFA verificados en fuente primaria · <b>el clínico decide</b><br>Versión actual: <b>v1.1</b>. Si esta línea muestra una versión anterior, recarga la página para actualizar.</div>
+  <div class="foot">ETHOS · Sepsis <b>v1.2</b> (16-jul-2026) — tutor docente estático · anclado en codebook v2 (congelado) · núcleo y tabla SOFA verificados en fuente primaria · <b>el clínico decide</b><br>Versión actual: <b>v1.2</b>. Si esta línea muestra una versión anterior, recarga la página con señal para actualizar.</div>
 
   <!-- Modal de referencia (citas clicables) -->
   <div id="refModal" class="ref-modal" onclick="if(event.target===this)closeRefModal()">
@@ -1703,6 +1709,16 @@ calcSofa();
 buildAction();
 renderRefList();
 renderCases();
+
+/* ---------- PWA: instalable + utilizable sin señal ----------
+   El service worker va a la RED PRIMERO: con conexión siempre se ve la última
+   versión, aunque la app esté instalada. La copia guardada es solo el respaldo
+   para cuando no hay señal — que es justo donde se usa esto, a la cabecera. */
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
